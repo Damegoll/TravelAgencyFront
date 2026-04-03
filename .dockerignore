@@ -1,0 +1,15 @@
+node_modules/
+npm-debug.log
+.git
+.gitignore
+.env.local
+.env
+.DS_Store
+dist/
+build/
+.vscode/
+.idea/
+*.log
+.cache/
+.next/
+.turbo/
