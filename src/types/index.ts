@@ -1,20 +1,61 @@
+
 export type Season = 'SUMMER' | 'WINTER' | 'AUTUMN' | 'SPRING'
 
-export type PackageType = 'EXPENSIVE' | 'BUDGET' | 'FAMILY'
+export type PackageType = 'LUXURY' | 'BUDGET' | 'FAMILY'
+
+export type TravelType = 'CULTURAL' | 'ADVENTURE' | 'GASTRONOMIC' | 'RURAL' | 'BEACH'
+
+export type PackageStatus = 'ACTIVE' | 'ARCHIVED' | 'SOLD_OUT'
+
+export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED'
+
+export type AccountStatus = 'ACTIVE' | 'DISABLED'
+
 
 export interface TravelPackage {
-  id: string
-  name: string
-  description: string
-  location: string
-  price: number
-  type: PackageType
-  seasons: Season[]
-  imageUrl: string
-  rating: number
-  duration: string
-  highlights: string[]
+  packageId: string
+  packageName: string
+  packageDestiny: string
+  packageDescription: string
+  travelType: TravelType
+  travelSeason: Season
+  packageType: PackageType
+  packageStartDate: string
+  packageEndDate: string
+  packagePrice: number
+  availableSpots: number
+  packageStatus: PackageStatus
 }
+
+export interface User {
+  accountId: string
+  email: string
+  firstName: string
+  lastName: string
+  roles: string[]
+  emailVerified: boolean
+}
+
+export interface Account {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  roles: string[]
+  status: AccountStatus
+}
+
+export interface Reservation {
+  reserveId: string
+  accountId: string
+  reservedPackage: TravelPackage
+  reservedDate: string
+  reservedCheckIn: string
+  reservedCheckOut: string
+  status: ReservationStatus
+  totalPriceCLP: number
+}
+
 
 export interface CartItem {
   packageData: TravelPackage
@@ -36,14 +77,6 @@ export interface CartState {
   total: number
 }
 
-export interface User {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  role: 'CUSTOMER' | 'ADMIN'
-}
-
 export interface RegisterData {
   firstName: string
   lastName: string
@@ -56,18 +89,8 @@ export interface LoginData {
   password: string
 }
 
-export interface ApiResponse<T> {
-  data: T
-  message: string
-  timestamp: string
-}
-
-export interface Booking {
-  id: string
-  userId: string
-  items: { packageId: string; quantity: number }[]
-  totalPaid: number
-  discountsApplied: string[]
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED'
-  createdAt: string
+export interface CreateReservationData {
+  packageId: string
+  reservedCheckIn: string
+  reservedCheckOut: string
 }
