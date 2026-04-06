@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext'
 export default function Header() {
   const location = useLocation()
   const { itemCount } = useCart()
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated, isAdmin, user, logout } = useAuth()
   const { isDark, toggle } = useTheme()
 
   const isActive = (path: string) => location.pathname === path
@@ -37,6 +37,32 @@ export default function Header() {
               {label}
             </Link>
           ))}
+
+          {isAuthenticated && (
+            <Link
+              to="/my-reservations"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                ${isActive('/my-reservations')
+                  ? 'bg-primary-500/15 text-primary-600 dark:text-primary-400'
+                  : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white hover:bg-surface-200/50 dark:hover:bg-white/10'
+                }`}
+            >
+              Mis Reservas
+            </Link>
+          )}
+
+          {isAdmin && (
+            <Link
+              to="/admin/dashboard"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                ${location.pathname.startsWith('/admin')
+                  ? 'bg-primary-500/15 text-primary-600 dark:text-primary-400'
+                  : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white hover:bg-surface-200/50 dark:hover:bg-white/10'
+                }`}
+            >
+              Admin
+            </Link>
+          )}
 
           <div className="w-px h-6 bg-surface-300 dark:bg-surface-600 mx-2" />
 
