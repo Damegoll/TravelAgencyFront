@@ -12,7 +12,7 @@ function calculateDiscounts(items: CartItem[]): { discount: Discount; amount: nu
   if (items.length === 0) return []
 
   const subtotal = items.reduce(
-    (sum, item) => sum + item.packageData.price * item.quantity,
+    (sum, item) => sum + item.packageData.packagePrice * item.quantity,
     0
   )
 
@@ -22,8 +22,8 @@ function calculateDiscounts(items: CartItem[]): { discount: Discount; amount: nu
     if (rule.condition(items)) {
       if (rule.id === 'disc-3') {
         const familyWinterTotal = items
-          .filter(item => item.packageData.type === 'FAMILY' && item.packageData.seasons.includes('WINTER'))
-          .reduce((sum, item) => sum + item.packageData.price * item.quantity, 0)
+          .filter(item => item.packageData.packageType === 'FAMILY' && item.packageData.travelSeason === 'WINTER')
+          .reduce((sum, item) => sum + item.packageData.packagePrice * item.quantity, 0)
         applied.push({ discount: rule, amount: familyWinterTotal * (rule.percentage / 100) })
       } else {
         applied.push({ discount: rule, amount: subtotal * (rule.percentage / 100) })
@@ -36,7 +36,7 @@ function calculateDiscounts(items: CartItem[]): { discount: Discount; amount: nu
 
 function computeState(items: CartItem[]): CartState {
   const subtotal = items.reduce(
-    (sum, item) => sum + item.packageData.price * item.quantity,
+    (sum, item) => sum + item.packageData.packagePrice * item.quantity,
     0
   )
   const appliedDiscounts = calculateDiscounts(items)
@@ -54,11 +54,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
       const existing = state.items.find(
-        item => item.packageData.id === action.payload.id
+        item => item.packageData.packageId === action.payload.packageId
       )
       const newItems = existing
         ? state.items.map(item =>
-            item.packageData.id === action.payload.id
+            item.packageData.packageId === action.payload.packageId
               ? { ...item, quantity: item.quantity + 1 }
               : item
           )
@@ -68,7 +68,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
     case 'REMOVE_ITEM': {
       const newItems = state.items.filter(
-        item => item.packageData.id !== action.payload
+        item => item.packageData.packageId !== action.payload
       )
       return computeState(newItems)
     }
@@ -76,12 +76,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case 'UPDATE_QUANTITY': {
       if (action.payload.quantity <= 0) {
         const newItems = state.items.filter(
-          item => item.packageData.id !== action.payload.id
+          item => item.packageData.packageId !== action.payload.id
         )
         return computeState(newItems)
       }
       const newItems = state.items.map(item =>
-        item.packageData.id === action.payload.id
+        item.packageData.packageId === action.payload.id
           ? { ...item, quantity: action.payload.quantity }
           : item
       )

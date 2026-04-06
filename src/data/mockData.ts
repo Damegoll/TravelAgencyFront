@@ -1,163 +1,5 @@
-import type { TravelPackage, Discount, CartItem, Season, PackageType } from '../types'
+import type { Season, PackageType, TravelType, CartItem, Discount } from '../types'
 
-export const mockPackages: TravelPackage[] = [
-  {
-    id: 'pkg-1',
-    name: 'Paraíso en Maldivas',
-    description: 'Experimenta el máximo lujo en villas sobre el agua con piscinas privadas, servicio de mayordomo personal y tratamientos de spa de clase mundial.',
-    location: 'Maldivas',
-    price: 4500000,
-    type: 'EXPENSIVE',
-    seasons: ['SUMMER', 'SPRING'],
-    imageUrl: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&h=400&fit=crop',
-    rating: 5,
-    duration: '7 días / 6 noches',
-    highlights: ['Villa privada sobre el agua', 'Mayordomo personal', 'Spa y bienestar'],
-  },
-  {
-    id: 'pkg-2',
-    name: 'Lujo Alpino Suizo',
-    description: 'Esquía en las mejores pistas del mundo, cena en restaurantes con estrellas Michelin y relájate en un entorno alpino de lujo.',
-    location: 'Suiza',
-    price: 5200000,
-    type: 'EXPENSIVE',
-    seasons: ['WINTER'],
-    imageUrl: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=600&h=400&fit=crop',
-    rating: 5,
-    duration: '5 días / 4 noches',
-    highlights: ['Cenas Michelin', 'Instructor de esquí privado', 'Vistas a la montaña'],
-  },
-  {
-    id: 'pkg-3',
-    name: 'Experiencia Gastronómica en la Toscana',
-    description: 'Sumérgete en la auténtica cocina italiana con clases de cocina privadas, recorridos por viñedos y búsqueda de trufas.',
-    location: 'Italia',
-    price: 3800000,
-    type: 'EXPENSIVE',
-    seasons: ['AUTUMN', 'SPRING'],
-    imageUrl: 'https://images.unsplash.com/photo-1523528283115-9bf9b1699245?w=600&h=400&fit=crop',
-    rating: 5,
-    duration: '6 días / 5 noches',
-    highlights: ['Clases de cocina', 'Recorridos por viñedos', 'Búsqueda de trufas'],
-  },
-  {
-    id: 'pkg-4',
-    name: 'Explorador de Bangkok',
-    description: 'Descubre la vibrante escena gastronómica callejera, templos antiguos y mercados bulliciosos de Bangkok a un precio accesible.',
-    location: 'Tailandia',
-    price: 650000,
-    type: 'BUDGET',
-    seasons: ['WINTER', 'SPRING'],
-    imageUrl: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&h=400&fit=crop',
-    rating: 4,
-    duration: '5 días / 4 noches',
-    highlights: ['Tour gastronómico callejero', 'Visitas a templos', 'Mercados nocturnos'],
-  },
-  {
-    id: 'pkg-5',
-    name: 'Escapada a Lisboa',
-    description: 'Explora barrios coloridos, disfruta de pasteles de nata y viaja en los icónicos tranvías amarillos.',
-    location: 'Portugal',
-    price: 480000,
-    type: 'BUDGET',
-    seasons: ['SUMMER', 'SPRING'],
-    imageUrl: 'https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=600&h=400&fit=crop',
-    rating: 4,
-    duration: '4 días / 3 noches',
-    highlights: ['Paseos en tranvía histórico', 'Degustación de pasteles locales', 'Barrio de Alfama'],
-  },
-  {
-    id: 'pkg-6',
-    name: 'Aventura en Marrakech',
-    description: 'Explora zocos bulliciosos, duerme bajo las estrellas en el Sahara y saborea el tagine tradicional.',
-    location: 'Marruecos',
-    price: 550000,
-    type: 'BUDGET',
-    seasons: ['AUTUMN', 'WINTER'],
-    imageUrl: 'https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=600&h=400&fit=crop',
-    rating: 4,
-    duration: '5 días / 4 noches',
-    highlights: ['Camping en el Sahara', 'Exploración de zocos', 'Cocina tradicional'],
-  },
-  {
-    id: 'pkg-7',
-    name: 'Mochilero en Bali',
-    description: 'Explora terrazas de arroz, toma clases de surf y disfruta de la vibrante vida nocturna, todo sin gastar una fortuna.',
-    location: 'Indonesia',
-    price: 720000,
-    type: 'BUDGET',
-    seasons: ['SUMMER'],
-    imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&h=400&fit=crop',
-    rating: 4,
-    duration: '7 días / 6 noches',
-    highlights: ['Senderismo por terrazas de arroz', 'Clases de surf', 'Ceremonias en templos'],
-  },
-  {
-    id: 'pkg-8',
-    name: 'Diversión Familiar en Orlando',
-    description: 'Parques temáticos, parques acuáticos y recuerdos familiares inolvidables en la capital mundial del entretenimiento.',
-    location: 'Estados Unidos',
-    price: 2200000,
-    type: 'FAMILY',
-    seasons: ['SUMMER', 'SPRING'],
-    imageUrl: 'https://images.unsplash.com/photo-1575089976121-8ed7b2a54265?w=600&h=400&fit=crop',
-    rating: 5,
-    duration: '7 días / 6 noches',
-    highlights: ['Entradas a parques temáticos', 'Acceso a parques acuáticos', 'Club infantil'],
-  },
-  {
-    id: 'pkg-9',
-    name: 'Naturaleza y Vida Silvestre en Costa Rica',
-    description: 'Lánzate en tirolesa por selvas tropicales, observa la vida silvestre y relájate en playas vírgenes, diversión para todas las edades.',
-    location: 'Costa Rica',
-    price: 1800000,
-    type: 'FAMILY',
-    seasons: ['WINTER', 'SPRING'],
-    imageUrl: 'https://images.unsplash.com/photo-1519999482648-25049ddd37b1?w=600&h=400&fit=crop',
-    rating: 5,
-    duration: '6 días / 5 noches',
-    highlights: ['Aventuras en tirolesa', 'Observación de vida silvestre', 'Días de playa'],
-  },
-  {
-    id: 'pkg-10',
-    name: 'Tour Cultural Japonés',
-    description: 'Templos, floración de cerezos, trenes bala y actividades aptas para niños en Tokio y Kioto.',
-    location: 'Japón',
-    price: 2800000,
-    type: 'FAMILY',
-    seasons: ['SPRING', 'AUTUMN'],
-    imageUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&h=400&fit=crop',
-    rating: 5,
-    duration: '8 días / 7 noches',
-    highlights: ['Pase de tren bala', 'Visitas a templos', 'Museos interactivos'],
-  },
-  {
-    id: 'pkg-11',
-    name: 'Recorrido por las Islas Griegas',
-    description: 'Navega entre impresionantes islas, nada en aguas cristalinas y disfruta de cenas familiares mediterráneas.',
-    location: 'Grecia',
-    price: 1950000,
-    type: 'FAMILY',
-    seasons: ['SUMMER'],
-    imageUrl: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&h=400&fit=crop',
-    rating: 4,
-    duration: '7 días / 6 noches',
-    highlights: ['Recorrido por islas', 'Snorkeling', 'Cocina mediterránea'],
-  },
-  {
-    id: 'pkg-12',
-    name: 'Explorador de las Montañas Rocosas Canadienses',
-    description: 'Haz senderismo por impresionantes paisajes montañosos, observa osos y navega en canoa por lagos turquesas.',
-    location: 'Canadá',
-    price: 2100000,
-    type: 'FAMILY',
-    seasons: ['SUMMER', 'AUTUMN'],
-    imageUrl: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?w=600&h=400&fit=crop',
-    rating: 5,
-    duration: '6 días / 5 noches',
-    highlights: ['Senderismo por montañas', 'Paseos en canoa por lagos', 'Observación de vida silvestre'],
-  },
-]
 
 export const discountRules: Discount[] = [
   {
@@ -187,11 +29,12 @@ export const discountRules: Discount[] = [
     percentage: 15,
     condition: (items: CartItem[]) => {
       return items.some(
-        item => item.packageData.type === 'FAMILY' && item.packageData.seasons.includes('WINTER')
+        item => item.packageData.packageType === 'FAMILY' && item.packageData.travelSeason === 'WINTER'
       )
     },
   },
 ]
+
 
 export const seasonLabels: Record<Season, { label: string; color: string }> = {
   SUMMER: { label: 'Verano', color: 'text-amber-500' },
@@ -201,22 +44,47 @@ export const seasonLabels: Record<Season, { label: string; color: string }> = {
 }
 
 export const packageTypeLabels: Record<PackageType, { label: string; color: string; bgColor: string }> = {
-  EXPENSIVE: { label: 'Premium', color: 'text-amber-300', bgColor: 'bg-amber-500/20' },
+  LUXURY: { label: 'Premium', color: 'text-amber-300', bgColor: 'bg-amber-500/20' },
   BUDGET: { label: 'Económico', color: 'text-emerald-300', bgColor: 'bg-emerald-500/20' },
   FAMILY: { label: 'Familiar', color: 'text-sky-300', bgColor: 'bg-sky-500/20' },
 }
 
-export const packageGradients: Record<string, string> = {
-  'pkg-1': 'from-cyan-400 via-blue-500 to-blue-700',
-  'pkg-2': 'from-slate-200 via-blue-200 to-indigo-400',
-  'pkg-3': 'from-amber-400 via-orange-500 to-red-600',
-  'pkg-4': 'from-yellow-400 via-orange-400 to-red-500',
-  'pkg-5': 'from-yellow-300 via-amber-400 to-orange-500',
-  'pkg-6': 'from-orange-400 via-red-500 to-purple-600',
-  'pkg-7': 'from-emerald-400 via-teal-500 to-cyan-600',
-  'pkg-8': 'from-pink-400 via-purple-500 to-indigo-600',
-  'pkg-9': 'from-green-400 via-emerald-500 to-teal-600',
-  'pkg-10': 'from-pink-300 via-rose-400 to-red-500',
-  'pkg-11': 'from-blue-300 via-sky-400 to-cyan-500',
-  'pkg-12': 'from-teal-400 via-emerald-500 to-green-700',
+export const travelTypeLabels: Record<TravelType, { label: string; emoji: string }> = {
+  CULTURAL: { label: 'Cultural', emoji: '🏛️' },
+  ADVENTURE: { label: 'Aventura', emoji: '🧗' },
+  GASTRONOMIC: { label: 'Gastronómico', emoji: '🍷' },
+  RURAL: { label: 'Rural', emoji: '🌿' },
+  BEACH: { label: 'Playa', emoji: '🏖️' },
+}
+
+export const seasonGradients: Record<Season, string> = {
+  SUMMER: 'from-amber-400 via-orange-500 to-red-500',
+  WINTER: 'from-blue-300 via-indigo-400 to-purple-500',
+  AUTUMN: 'from-orange-400 via-red-500 to-amber-600',
+  SPRING: 'from-pink-300 via-rose-400 to-fuchsia-500',
+}
+
+export const seasonDescriptions: Record<Season, string> = {
+  SUMMER: 'Cualquier calor compañero',
+  WINTER: 'Ta helao, abrigarse',
+  AUTUMN: 'Inverno penca',
+  SPRING: 'Tengo la densa alergia ayudaaaaaaa',
+}
+
+
+export const travelTypeGradients: Record<TravelType, string> = {
+  CULTURAL: 'from-purple-400 via-indigo-500 to-blue-600',
+  ADVENTURE: 'from-emerald-400 via-teal-500 to-cyan-600',
+  GASTRONOMIC: 'from-amber-400 via-orange-500 to-red-600',
+  RURAL: 'from-green-400 via-emerald-500 to-teal-600',
+  BEACH: 'from-cyan-400 via-blue-500 to-blue-700',
+}
+
+
+export const travelTypeImages: Record<TravelType, string> = {
+  CULTURAL: 'https://images.unsplash.com/photo-1523528283115-9bf9b1699245?w=600&h=400&fit=crop',
+  ADVENTURE: 'https://images.unsplash.com/photo-1519999482648-25049ddd37b1?w=600&h=400&fit=crop',
+  GASTRONOMIC: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop',
+  RURAL: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop',
+  BEACH: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&h=400&fit=crop',
 }
