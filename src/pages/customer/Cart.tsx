@@ -1,10 +1,78 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
-import { seasonLabels, packageTypeLabels, packageGradients, discountRules } from '../../data/mockData'
+import { useAuth } from '../../context/AuthContext'
+import { reservationService } from '../../api/reservationService'
+import { packageTypeLabels, travelTypeGradients, travelTypeImages, discountRules } from '../../data/mockData'
 import { formatCLP } from '../../utils/format'
 
 export default function Cart() {
   const { items, subtotal, appliedDiscounts, total, removeFromCart, updateQuantity, clearCart, itemCount } = useCart()
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  const [checkingOut, setCheckingOut] = useState(false)
+  const [checkoutError, setCheckoutError] = useState('')
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false)
+
+  const handleCheckout = async () => {
+    if (!isAuthenticated) {
+      navigate('/login')
+      return
+    }
+
+    setCheckingOut(true)
+    setCheckoutError('')
+
+    try {
+
+      for (const item of items) {
+        for (let i = 0; i < item.quantity; i++) {
+          await reservationService.createReservation({
+            packageId: item.packageData.packageId,
+            reservedCheckIn: item.packageData.packageStartDate,
+            reservedCheckOut: item.packageData.packageEndDate,
+          })
+        }
+      }
+      setCheckoutSuccess(true)
+      clearCart()
+    } catch (err: any) {
+      setCheckoutError(
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        'Error al procesar la reserva. Intenta de nuevo.'
+      )
+    } finally {
+      setCheckingOut(false)
+    }
+  }
+
+  if (checkoutSuccess) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-20 text-center animate-fade-in">
+        <p className="text-6xl mb-6">🎉</p>
+        <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-3">¡Reserva confirmada!</h1>
+        <p className="text-surface-500 dark:text-surface-400 mb-8 max-w-md mx-auto">
+          Tus paquetes han sido reservados exitosamente. Puedes ver tus reservas en tu perfil.
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Link
+            to="/my-reservations"
+            className="inline-flex px-8 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-primary hover:-translate-y-0.5"
+          >
+            Ver mis reservas
+          </Link>
+          <Link
+            to="/search"
+            className="inline-flex px-8 py-3 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 font-semibold rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 transition-all duration-200"
+          >
+            Seguir explorando
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   if (items.length === 0) {
     return (
@@ -42,18 +110,19 @@ export default function Cart() {
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-grow space-y-4">
           {items.map(({ packageData: pkg, quantity }) => {
-            const typeInfo = packageTypeLabels[pkg.type]
-            const gradient = packageGradients[pkg.id] || 'from-gray-400 to-gray-600'
+            const typeInfo = packageTypeLabels[pkg.packageType]
+            const gradient = travelTypeGradients[pkg.travelType] || 'from-gray-400 to-gray-600'
+            const imageUrl = travelTypeImages[pkg.travelType]
 
             return (
               <div
-                key={pkg.id}
+                key={pkg.packageId}
                 className="flex flex-col sm:flex-row bg-white dark:bg-surface-800/60 rounded-2xl border border-surface-200/50 dark:border-surface-700/50 overflow-hidden hover:shadow-md transition-shadow"
               >
                 <div className={`sm:w-48 h-32 sm:h-auto bg-gradient-to-br ${gradient} flex-shrink-0 relative`}>
                   <img
-                    src={pkg.imageUrl}
-                    alt={pkg.name}
+                    src={imageUrl}
+                    alt={pkg.packageName}
                     className="absolute inset-0 w-full h-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
@@ -62,24 +131,20 @@ export default function Cart() {
                 <div className="flex-grow p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex-grow">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-surface-900 dark:text-white">{pkg.name}</h3>
+                      <h3 className="font-bold text-surface-900 dark:text-white">{pkg.packageName}</h3>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${typeInfo.bgColor} ${typeInfo.color}`}>
                         {typeInfo.label}
                       </span>
                     </div>
-                    <p className="text-sm text-surface-500 dark:text-surface-400 mb-2">{pkg.location} · {pkg.duration}</p>
-                    <div className="flex flex-wrap gap-1">
-                      {pkg.seasons.map(s => (
-                        <span key={s} className="text-xs text-surface-400 dark:text-surface-500">
-                        </span>
-                      ))}
-                    </div>
+                    <p className="text-sm text-surface-500 dark:text-surface-400 mb-2">
+                      {pkg.packageDestiny} · {new Date(pkg.packageStartDate).toLocaleDateString('es-CL')} → {new Date(pkg.packageEndDate).toLocaleDateString('es-CL')}
+                    </p>
                   </div>
 
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => updateQuantity(pkg.id, quantity - 1)}
+                        onClick={() => updateQuantity(pkg.packageId, quantity - 1)}
                         className="w-8 h-8 flex items-center justify-center rounded-lg bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors text-lg font-bold"
                       >
                         −
@@ -88,7 +153,7 @@ export default function Cart() {
                         {quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(pkg.id, quantity + 1)}
+                        onClick={() => updateQuantity(pkg.packageId, quantity + 1)}
                         className="w-8 h-8 flex items-center justify-center rounded-lg bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors text-lg font-bold"
                       >
                         +
@@ -97,17 +162,17 @@ export default function Cart() {
 
                     <div className="text-right">
                       <p className="font-bold text-surface-900 dark:text-white text-lg">
-                        {formatCLP(pkg.price * quantity)}
+                        {formatCLP(pkg.packagePrice * quantity)}
                       </p>
                       {quantity > 1 && (
-                        <p className="text-xs text-surface-400">{formatCLP(pkg.price)} c/u</p>
+                        <p className="text-xs text-surface-400">{formatCLP(pkg.packagePrice)} c/u</p>
                       )}
                     </div>
 
                     <button
-                      onClick={() => removeFromCart(pkg.id)}
+                      onClick={() => removeFromCart(pkg.packageId)}
                       className="p-2 text-surface-400 hover:text-danger transition-colors"
-                      aria-label={`Remove ${pkg.name}`}
+                      aria-label={`Remove ${pkg.packageName}`}
                     >
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="3 6 5 6 21 6" />
@@ -176,10 +241,22 @@ export default function Cart() {
               )}
             </div>
 
+            {checkoutError && (
+              <div className="bg-danger/10 border border-danger/30 text-danger text-sm rounded-xl px-4 py-3">
+                {checkoutError}
+              </div>
+            )}
+
             <button
-              className="w-full py-3.5 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-primary hover:-translate-y-0.5 active:translate-y-0"
+              onClick={handleCheckout}
+              disabled={checkingOut}
+              className="w-full py-3.5 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-primary hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Proceder al pago
+              {checkingOut
+                ? 'Procesando...'
+                : isAuthenticated
+                ? 'Proceder al pago'
+                : 'Inicia sesión para reservar'}
             </button>
 
             <Link

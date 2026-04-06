@@ -1,18 +1,27 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import PackageCard from '../../components/PackageCard'
-import { mockPackages, seasonLabels } from '../../data/mockData'
-import type { Season } from '../../types'
+import { seasonLabels, seasonGradients, seasonDescriptions } from '../../data/mockData'
+import { packageService } from '../../api/packageService'
+import type { Season, TravelPackage } from '../../types'
 
-const featuredPackages = mockPackages.slice(0, 6)
-
-const seasonCards: { season: Season; gradient: string; description: string }[] = [
-  { season: 'SUMMER', gradient: 'from-amber-400 via-orange-500 to-red-500', description: 'Cualquier calor compañero' },
-  { season: 'WINTER', gradient: 'from-blue-300 via-indigo-400 to-purple-500', description: 'Ta helao, abrigarse' },
-  { season: 'AUTUMN', gradient: 'from-orange-400 via-red-500 to-amber-600', description: 'Inverno penca' },
-  { season: 'SPRING', gradient: 'from-pink-300 via-rose-400 to-fuchsia-500', description: 'Tengo la densa alergia ayudaaaaaaa' },
-]
+const seasons: Season[] = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 
 export default function Home() {
+  const [packages, setPackages] = useState<TravelPackage[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    packageService
+      .getAllPackages()
+      .then(setPackages)
+      .catch(() => setError('No se pudieron cargar los paquetes'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const featuredPackages = packages.slice(0, 6)
+
   return (
     <div className="animate-fade-in">
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-800 to-surface-900 py-24 px-6">
@@ -59,8 +68,10 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {seasonCards.map(({ season, gradient, description }) => {
+          {seasons.map(season => {
             const info = seasonLabels[season]
+            const gradient = seasonGradients[season]
+            const description = seasonDescriptions[season]
             return (
               <Link
                 key={season}
@@ -96,11 +107,22 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredPackages.map(pkg => (
-            <PackageCard key={pkg.id} pkg={pkg} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="w-10 h-10 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-5xl mb-4">⚠️</p>
+            <p className="text-surface-500 dark:text-surface-400">{error}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredPackages.map(pkg => (
+              <PackageCard key={pkg.packageId} pkg={pkg} />
+            ))}
+          </div>
+        )}
 
         <div className="sm:hidden text-center mt-8">
           <Link
