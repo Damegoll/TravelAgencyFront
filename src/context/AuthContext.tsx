@@ -1,9 +1,12 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import type { User, LoginData, RegisterData } from '../types'
+import { authService } from '../api/authService'
+import { accountService } from '../api/accountService'
 
 interface AuthContextValue {
   user: User | null
   isAuthenticated: boolean
+  isAdmin: boolean
   isLoading: boolean
   login: (data: LoginData) => Promise<{ success: boolean; error?: string }>
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>
@@ -16,65 +19,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const isAdmin = user?.roles?.includes('ADMIN') ?? false
+
+
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('travel-agency-user')
-      if (saved) {
-        setUser(JSON.parse(saved))
-      }
-    } catch {
-      localStorage.removeItem('travel-agency-user')
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setIsLoading(false)
+      return
     }
-    setIsLoading(false)
+    authService
+      .getCurrentUser()
+      .then(setUser)
+      .catch(() => {
+        localStorage.removeItem('token')
+      })
+      .finally(() => setIsLoading(false))
   }, [])
 
-  const login = async (data: LoginData): Promise<{ success: boolean; error?: string }> => {
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    if (!data.email || !data.password) {
-      return { success: false, error: 'Email and password are required' }
+  const login = useCallback(async (data: LoginData): Promise<{ success: boolean; error?: string }> => {
+    try {
+      await authService.login(data)
+      const me = await authService.getCurrentUser()
+      setUser(me)
+      return { success: true }
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        'Credenciales inválidas'
+      return { success: false, error: message }
     }
+  }, [])
 
-    const mockUser: User = {
-      id: 'user-1',
-      firstName: 'Test',
-      lastName: 'User',
-      email: data.email,
-      role: 'CUSTOMER',
+  const register = useCallback(async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
+    try {
+      await accountService.register(data)
+
+      return { success: true }
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        'Error al registrar la cuenta'
+      return { success: false, error: message }
     }
+  }, [])
 
-    setUser(mockUser)
-    localStorage.setItem('travel-agency-user', JSON.stringify(mockUser))
-    return { success: true }
-  }
-
-  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    const mockUser: User = {
-      id: 'user-' + Date.now(),
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      role: 'CUSTOMER',
-    }
-
-    setUser(mockUser)
-    localStorage.setItem('travel-agency-user', JSON.stringify(mockUser))
-    return { success: true }
-  }
-
-  const logout = () => {
+  const logout = useCallback(() => {
+    authService.logout()
     setUser(null)
-    localStorage.removeItem('travel-agency-user')
-    localStorage.removeItem('token')
-  }
+  }, [])
 
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: !!user,
+        isAdmin,
         isLoading,
         login,
         register,
