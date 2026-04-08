@@ -1,17 +1,16 @@
 import api from './axiosConfig'
-import type { User, LoginData } from '../types'
 
 export const authService = {
 
-  async login(data: LoginData): Promise<string> {
+  async login(data) {
     const res = await api.post('/auth/login', data)
-    const token: string = res.data.token ?? res.data
+    const token = res.data.token ?? res.data
     localStorage.setItem('token', token)
     return token
   },
 
 
-  async logout(): Promise<void> {
+  async logout() {
     try {
       await api.post('/auth/logout')
     } catch {
@@ -21,8 +20,8 @@ export const authService = {
   },
 
 
-  async getCurrentUser(): Promise<User> {
-    const res = await api.get<User>('/auth/me')
+  async getCurrentUser() {
+    const res = await api.get('/auth/me')
     return res.data
   },
 }

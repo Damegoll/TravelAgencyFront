@@ -1,15 +1,9 @@
-import type { TravelPackage } from '../types'
 import { useCart } from '../context/CartContext'
 import { seasonLabels, packageTypeLabels, travelTypeLabels, travelTypeGradients, travelTypeImages } from '../data/mockData'
 import { formatCLP } from '../utils/format'
 import { useState } from 'react'
 
-interface PackageCardProps {
-  pkg: TravelPackage
-  compact?: boolean
-}
-
-export default function PackageCard({ pkg, compact = false }: PackageCardProps) {
+export default function PackageCard({ pkg, compact = false }) {
   const { addToCart } = useCart()
   const [added, setAdded] = useState(false)
 
@@ -44,8 +38,8 @@ export default function PackageCard({ pkg, compact = false }: PackageCardProps) 
           src={imageUrl}
           alt={pkg.packageName}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1' }}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+          onLoad={(e) => { e.target.style.opacity = '1' }}
+          onError={(e) => { e.target.style.display = 'none' }}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />

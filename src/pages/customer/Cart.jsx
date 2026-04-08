@@ -25,7 +25,6 @@ export default function Cart() {
     setCheckoutError('')
 
     try {
-
       for (const item of items) {
         for (let i = 0; i < item.quantity; i++) {
           await reservationService.createReservation({
@@ -37,7 +36,7 @@ export default function Cart() {
       }
       setCheckoutSuccess(true)
       clearCart()
-    } catch (err: any) {
+    } catch (err) {
       setCheckoutError(
         err?.response?.data?.message ||
         err?.response?.data?.error ||
@@ -124,7 +123,7 @@ export default function Cart() {
                     src={imageUrl}
                     alt={pkg.packageName}
                     className="absolute inset-0 w-full h-full object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    onError={(e) => { e.target.style.display = 'none' }}
                   />
                 </div>
 

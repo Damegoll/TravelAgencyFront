@@ -4,31 +4,30 @@ import PackageCard from '../../components/PackageCard'
 import { seasonLabels, packageTypeLabels, travelTypeLabels } from '../../data/mockData'
 import { packageService } from '../../api/packageService'
 import { formatCLP } from '../../utils/format'
-import type { Season, PackageType, TravelType, TravelPackage } from '../../types'
 
-const allSeasons: Season[] = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
-const allTypes: PackageType[] = ['LUXURY', 'BUDGET', 'FAMILY']
-const allTravelTypes: TravelType[] = ['CULTURAL', 'ADVENTURE', 'GASTRONOMIC', 'RURAL', 'BEACH']
+const allSeasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
+const allTypes = ['LUXURY', 'BUDGET', 'FAMILY']
+const allTravelTypes = ['CULTURAL', 'ADVENTURE', 'GASTRONOMIC', 'RURAL', 'BEACH']
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [packages, setPackages] = useState<TravelPackage[]>([])
+  const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const [searchText, setSearchText] = useState('')
-  const [selectedSeasons, setSelectedSeasons] = useState<Season[]>(() => {
+  const [selectedSeasons, setSelectedSeasons] = useState(() => {
     const param = searchParams.get('season')
-    return param ? [param as Season] : []
+    return param ? [param] : []
   })
-  const [selectedTypes, setSelectedTypes] = useState<PackageType[]>(() => {
+  const [selectedTypes, setSelectedTypes] = useState(() => {
     const param = searchParams.get('type')
-    return param ? [param as PackageType] : []
+    return param ? [param] : []
   })
-  const [selectedTravelTypes, setSelectedTravelTypes] = useState<TravelType[]>([])
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000])
-  const [sortBy, setSortBy] = useState<'price-asc' | 'price-desc' | 'name' | 'date'>('date')
+  const [selectedTravelTypes, setSelectedTravelTypes] = useState([])
+  const [priceRange, setPriceRange] = useState([0, 10000000])
+  const [sortBy, setSortBy] = useState('date')
 
   useEffect(() => {
     packageService
@@ -38,19 +37,19 @@ export default function Search() {
       .finally(() => setLoading(false))
   }, [])
 
-  const toggleSeason = (season: Season) => {
+  const toggleSeason = (season) => {
     setSelectedSeasons(prev =>
       prev.includes(season) ? prev.filter(s => s !== season) : [...prev, season]
     )
   }
 
-  const toggleType = (type: PackageType) => {
+  const toggleType = (type) => {
     setSelectedTypes(prev =>
       prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
     )
   }
 
-  const toggleTravelType = (type: TravelType) => {
+  const toggleTravelType = (type) => {
     setSelectedTravelTypes(prev =>
       prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
     )
@@ -251,7 +250,7 @@ export default function Search() {
             </p>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              onChange={(e) => setSortBy(e.target.value)}
               className="px-3 py-2 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg text-sm text-surface-700 dark:text-surface-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
             >
               <option value="date">Fecha de salida</option>

@@ -3,12 +3,11 @@ import { Link } from 'react-router-dom'
 import PackageCard from '../../components/PackageCard'
 import { seasonLabels, seasonGradients, seasonDescriptions } from '../../data/mockData'
 import { packageService } from '../../api/packageService'
-import type { Season, TravelPackage } from '../../types'
 
-const seasons: Season[] = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
+const seasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 
 export default function Home() {
-  const [packages, setPackages] = useState<TravelPackage[]>([])
+  const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -150,38 +149,42 @@ export default function Home() {
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
               ),
-              title: 'Viajes seleccionados',
-              desc: 'Cada paquete es cuidadosamente seleccionado y revisado por nuestros expertos en viajes.',
+              title: 'Oferta Variada',
+              desc: 'Descubre destinos de todo el mundo:desde playas paradisiacas hasta aventuras en la montaña.',
             },
             {
               icon: (
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="1" x2="12" y2="23" />
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  <polyline points="12 1 22 5 22 19 12 23 2 19 2 5 12 1" />
+                  <polyline points="12 12.46 20.24 8.6 20.24 15.5 12 19.35 3.76 15.5 3.76 8.6 12 12.46" />
                 </svg>
               ),
-              title: 'Los Mejores Precios',
-              desc: 'Descuentos por multi-reserva y ofertas de temporada para las mejores ofertas.',
+              title: 'Mejores Precios',
+              desc: 'Competimos con los mejores del mercado. Descuentos progresivos por reservas múltiples.',
             },
             {
               icon: (
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               ),
-              title: 'Soporte 24/7',
-              desc: 'Nuestro equipo está disponible las 24 horas del día para ayudarte con tu viaje.',
+              title: 'Seguridad Garantizada',
+              desc: 'Todos nuestros destinos son seguros. Tus datos están protegidos con encriptación.',
             },
-          ].map((item, i) => (
+          ].map((feature, idx) => (
             <div
-              key={i}
-              className="bg-white dark:bg-surface-800/60 p-8 rounded-2xl border border-surface-200/50 dark:border-surface-700/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center"
+              key={idx}
+              className="group bg-white dark:bg-surface-800/60 rounded-2xl border border-surface-200/50 dark:border-surface-700/50 p-8 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
             >
-              <div className="inline-flex p-3 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 mb-4">
-                {item.icon}
+              <div className="w-12 h-12 rounded-xl bg-primary-500/15 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4 group-hover:bg-primary-500/25 transition-colors">
+                {feature.icon}
               </div>
-              <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-2">{item.title}</h3>
-              <p className="text-surface-500 dark:text-surface-400 text-sm">{item.desc}</p>
+              <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-surface-500 dark:text-surface-400 text-sm leading-relaxed">
+                {feature.desc}
+              </p>
             </div>
           ))}
         </div>

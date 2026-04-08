@@ -1,13 +1,8 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
-interface ThemeContextValue {
-  isDark: boolean
-  toggle: () => void
-}
+const ThemeContext = createContext(null)
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
-
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('travel-agency-theme')
     if (saved) return saved === 'dark'

@@ -1,14 +1,7 @@
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react'
-import type { CartItem, CartState, Discount, TravelPackage } from '../types'
+import { createContext, useContext, useReducer, useEffect } from 'react'
 import { discountRules } from '../data/mockData'
 
-type CartAction =
-  | { type: 'ADD_ITEM'; payload: TravelPackage }
-  | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
-  | { type: 'CLEAR_CART' }
-
-function calculateDiscounts(items: CartItem[]): { discount: Discount; amount: number }[] {
+function calculateDiscounts(items) {
   if (items.length === 0) return []
 
   const subtotal = items.reduce(
@@ -16,7 +9,7 @@ function calculateDiscounts(items: CartItem[]): { discount: Discount; amount: nu
     0
   )
 
-  const applied: { discount: Discount; amount: number }[] = []
+  const applied = []
 
   for (const rule of discountRules) {
     if (rule.condition(items)) {
@@ -34,7 +27,7 @@ function calculateDiscounts(items: CartItem[]): { discount: Discount; amount: nu
   return applied
 }
 
-function computeState(items: CartItem[]): CartState {
+function computeState(items) {
   const subtotal = items.reduce(
     (sum, item) => sum + item.packageData.packagePrice * item.quantity,
     0
@@ -50,7 +43,7 @@ function computeState(items: CartItem[]): CartState {
   }
 }
 
-function cartReducer(state: CartState, action: CartAction): CartState {
+function cartReducer(state, action) {
   switch (action.type) {
     case 'ADD_ITEM': {
       const existing = state.items.find(
@@ -96,22 +89,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   }
 }
 
-interface CartContextValue extends CartState {
-  addToCart: (pkg: TravelPackage) => void
-  removeFromCart: (packageId: string) => void
-  updateQuantity: (packageId: string, quantity: number) => void
-  clearCart: () => void
-  itemCount: number
-}
+const CartContext = createContext(null)
 
-const CartContext = createContext<CartContextValue | null>(null)
-
-export function CartProvider({ children }: { children: ReactNode }) {
-  const loadInitialState = (): CartState => {
+export function CartProvider({ children }) {
+  const loadInitialState = () => {
     try {
       const saved = localStorage.getItem('travel-agency-cart')
       if (saved) {
-        const parsed = JSON.parse(saved) as CartItem[]
+        const parsed = JSON.parse(saved)
         return computeState(parsed)
       }
     } catch {
@@ -125,7 +110,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('travel-agency-cart', JSON.stringify(state.items))
   }, [state.items])
 
-  const value: CartContextValue = {
+  const value = {
     ...state,
     itemCount: state.items.reduce((sum, item) => sum + item.quantity, 0),
     addToCart: (pkg) => dispatch({ type: 'ADD_ITEM', payload: pkg }),

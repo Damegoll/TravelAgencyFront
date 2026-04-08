@@ -9,7 +9,7 @@ export default function Header() {
   const { isAuthenticated, isAdmin, user, logout } = useAuth()
   const { isDark, toggle } = useTheme()
 
-  const isActive = (path: string) => location.pathname === path
+  const isActive = (path) => location.pathname === path
 
   const navLinks = [
     { path: '/', label: 'Inicio' },

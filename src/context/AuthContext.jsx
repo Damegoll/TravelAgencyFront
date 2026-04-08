@@ -1,26 +1,14 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
-import type { User, LoginData, RegisterData } from '../types'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { authService } from '../api/authService'
 import { accountService } from '../api/accountService'
 
-interface AuthContextValue {
-  user: User | null
-  isAuthenticated: boolean
-  isAdmin: boolean
-  isLoading: boolean
-  login: (data: LoginData) => Promise<{ success: boolean; error?: string }>
-  register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>
-  logout: () => void
-}
+const AuthContext = createContext(null)
 
-const AuthContext = createContext<AuthContextValue | null>(null)
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
   const isAdmin = user?.roles?.includes('ADMIN') ?? false
-
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -37,13 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false))
   }, [])
 
-  const login = useCallback(async (data: LoginData): Promise<{ success: boolean; error?: string }> => {
+  const login = useCallback(async (data) => {
     try {
       await authService.login(data)
       const me = await authService.getCurrentUser()
       setUser(me)
       return { success: true }
-    } catch (err: any) {
+    } catch (err) {
       const message =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
@@ -52,12 +40,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const register = useCallback(async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
+  const register = useCallback(async (data) => {
     try {
       await accountService.register(data)
-
       return { success: true }
-    } catch (err: any) {
+    } catch (err) {
       const message =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
