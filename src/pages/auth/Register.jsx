@@ -18,6 +18,7 @@ export default function Register() {
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
   })
@@ -40,6 +41,7 @@ export default function Register() {
       firstName: form.firstName.trim().length >= 2,
       lastName: form.lastName.trim().length >= 2,
       email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email),
+      phone: /^(\+56\s?)?9\d{4}\s?\d{4}$|^(\+56)?912345678$/.test(form.phone.replace(/\s/g, '')) && form.phone.length >= 9,
       password: passwordRules.every(rule => rule.test(form.password)),
       confirmPassword: form.password.length > 0 && form.password === form.confirmPassword,
     }
@@ -58,6 +60,7 @@ export default function Register() {
       firstName: true,
       lastName: true,
       email: true,
+      phone: true,
       password: true,
       confirmPassword: true,
     })
@@ -74,6 +77,7 @@ export default function Register() {
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
       email: form.email.trim(),
+      phone: form.phone.trim(),
       password: form.password,
     })
 
@@ -181,6 +185,31 @@ export default function Register() {
               {touched.email && !validation.email && (
                 <p className="text-xs text-danger mt-1">Ingresa un correo válido</p>
               )}
+            </div>
+
+            <div>
+                <label htmlFor="reg-phone" className="block text-sm front.medium text-surface-700:text-surface-3900 mb-1.5">
+                    Teléfono
+                </label>
+                <div className="relative">
+                    <input
+                        id="reg-phone"
+                        type="tel"
+                        required
+                        value={form.phone}
+                        onChange={(e) => update('phone', e.target.value)}
+                        onBlur={() => touch('phone')}
+                        placeholder="+56 9 1234 5678"
+                        maxLength="16"
+                        className={`w-full px-4 py-3 pr-20 bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl text-surface-900 dark:text-white placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all ${fieldClass('phone')}`}
+                    />
+                    {touched.phone && !validation.phone && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-success text-lg">✓</span>
+                    )}
+                </div>
+                {touched.phone && !validation.phone && (
+                    <p className="text-xs text-danger mt-1">Ingresa un teléfono válido</p>
+                )}
             </div>
 
             <div>

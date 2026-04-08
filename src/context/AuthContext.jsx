@@ -10,6 +10,8 @@ export function AuthProvider({ children }) {
 
   const isAdmin = user?.roles?.includes('ADMIN') ?? false
 
+  const phone = user?.phone ?? null
+
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
@@ -62,6 +64,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         user,
+        phone,
         isAuthenticated: !!user,
         isAdmin,
         isLoading,

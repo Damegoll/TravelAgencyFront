@@ -33,6 +33,7 @@ export interface User {
   firstName: string
   lastName: string
   roles: string[]
+  phone?: string
   emailVerified: boolean
 }
 
@@ -81,6 +82,7 @@ export interface RegisterData {
   firstName: string
   lastName: string
   email: string
+  phone: string
   password: string
 }
 
