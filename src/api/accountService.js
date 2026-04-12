@@ -16,6 +16,11 @@ export const accountService = {
     return res.data
   },
 
+  async updateAccount(id, data) {
+    const res = await api.put(`/accounts/${id}`, data)
+    return res.data
+  },
+
   async updateAccountStatus(id, status) {
     const res = await api.put(`/accounts/${id}/status`, { status })
     return res.data

@@ -115,6 +115,16 @@ export default function Header() {
               <span className="text-sm text-surface-600 dark:text-surface-300 hidden sm:inline">
                 {user?.firstName}
               </span>
+              <Link
+                to="/profile"
+                className={`px-3 py-1.5 text-sm rounded-lg transition-all duration-200
+                  ${isActive('/profile')
+                    ? 'bg-primary-500/15 text-primary-600 dark:text-primary-400'
+                    : 'text-surface-500 dark:text-surface-400 hover:bg-surface-200/50 dark:hover:bg-white/10'
+                  }`}
+              >
+                Perfil
+              </Link>
               <button
                 onClick={logout}
                 className="px-3 py-1.5 text-sm rounded-lg text-surface-500 dark:text-surface-400 hover:bg-surface-200/50 dark:hover:bg-white/10 transition-all duration-200"

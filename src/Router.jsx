@@ -5,6 +5,7 @@ import Home from './pages/customer/Home'
 import Search from './pages/customer/Search'
 import Cart from './pages/customer/Cart'
 import MyReservations from './pages/customer/MyReservations'
+import Profile from './pages/customer/Profile'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Dashboard from './pages/admin/Dashboard'
@@ -26,6 +27,14 @@ export default function Router() {
           element={
             <ProtectedRoute>
               <MyReservations />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
