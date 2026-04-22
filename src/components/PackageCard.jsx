@@ -2,6 +2,15 @@ import { useCart } from '../context/CartContext'
 import { seasonLabels, packageTypeLabels, travelTypeLabels, travelTypeGradients, travelTypeImages } from '../data/mockData'
 import { formatCLP } from '../utils/format'
 import { useState } from 'react'
+import { BuildingLibraryIcon, BoltIcon, FireIcon, GlobeAltIcon, SunIcon } from '@heroicons/react/24/outline'
+
+const travelTypeIcons = {
+  CULTURAL: BuildingLibraryIcon,
+  ADVENTURE: BoltIcon,
+  GASTRONOMIC: FireIcon,
+  RURAL: GlobeAltIcon,
+  BEACH: SunIcon,
+}
 
 export default function PackageCard({ pkg, compact = false }) {
   const { addToCart } = useCart()
@@ -55,8 +64,9 @@ export default function PackageCard({ pkg, compact = false }) {
           )}
         </div>
 
-        <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs bg-black/30 text-white backdrop-blur-sm">
-          {travelInfo.emoji} {travelInfo.label}
+        <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs bg-black/30 text-white backdrop-blur-sm flex items-center gap-1">
+          {(() => { const TIcon = travelTypeIcons[pkg.travelType]; return TIcon ? <TIcon className="w-3.5 h-3.5" /> : null })()}
+          {travelInfo.label}
         </div>
 
         <div className="absolute bottom-3 left-3 flex items-center gap-1 text-white text-sm font-medium">

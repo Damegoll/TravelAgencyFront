@@ -4,6 +4,7 @@ import PackageCard from '../../components/PackageCard'
 import { seasonLabels, seasonGradients, seasonDescriptions } from '../../data/mockData'
 import { packageService } from '../../api/packageService'
 import { getKeycloakRegistrationUrl } from '../../utils/keycloak'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 
 const seasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 
@@ -113,7 +114,7 @@ export default function Home() {
           </div>
         ) : error ? (
           <div className="text-center py-20">
-            <p className="text-5xl mb-4">⚠️</p>
+            <ExclamationTriangleIcon className="w-12 h-12 mx-auto mb-4 text-warning" />
             <p className="text-surface-500 dark:text-surface-400">{error}</p>
           </div>
         ) : (

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { accountService } from '../../api/accountService'
 import { reservationService } from '../../api/reservationService'
+import { ClipboardDocumentListIcon, MapPinIcon, CalendarDaysIcon } from '@heroicons/react/24/outline'
 
 export default function Profile() {
   const { user, updateUser } = useAuth()
@@ -163,7 +164,7 @@ export default function Profile() {
               </div>
             ) : reservations.length === 0 ? (
               <div className="text-center py-12 bg-surface-50 dark:bg-surface-700/30 rounded-xl border border-surface-200 dark:border-surface-600">
-                <p className="text-5xl mb-4">📋</p>
+                <ClipboardDocumentListIcon className="w-12 h-12 mx-auto mb-4 text-surface-400 dark:text-surface-500" />
                 <p className="text-surface-500 dark:text-surface-400">No tienes reservas aún</p>
               </div>
             ) : (
@@ -176,10 +177,10 @@ export default function Profile() {
                           {res.reservedPackage.packageName}
                         </h3>
                         <p className="text-sm text-surface-500 dark:text-surface-400 mt-1">
-                          📍 {res.reservedPackage.packageDestiny}
+                          <MapPinIcon className="w-4 h-4 inline mr-1" />{res.reservedPackage.packageDestiny}
                         </p>
                         <p className="text-sm text-surface-600 dark:text-surface-300 mt-2">
-                          🗓️ {new Date(res.reservedCheckIn).toLocaleDateString('es-CL')} - {new Date(res.reservedCheckOut).toLocaleDateString('es-CL')}
+                          <CalendarDaysIcon className="w-4 h-4 inline mr-1" />{new Date(res.reservedCheckIn).toLocaleDateString('es-CL')} - {new Date(res.reservedCheckOut).toLocaleDateString('es-CL')}
                         </p>
                       </div>
                       <div className="text-right ml-4">

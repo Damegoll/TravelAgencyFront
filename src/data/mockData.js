@@ -47,11 +47,11 @@ export const packageTypeLabels = {
 }
 
 export const travelTypeLabels = {
-  CULTURAL: { label: 'Cultural', emoji: '🏛️' },
-  ADVENTURE: { label: 'Aventura', emoji: '🧗' },
-  GASTRONOMIC: { label: 'Gastronómico', emoji: '🍷' },
-  RURAL: { label: 'Rural', emoji: '🌿' },
-  BEACH: { label: 'Playa', emoji: '🏖️' },
+  CULTURAL: { label: 'Cultural', icon: 'CULTURAL' },
+  ADVENTURE: { label: 'Aventura', icon: 'ADVENTURE' },
+  GASTRONOMIC: { label: 'Gastronómico', icon: 'GASTRONOMIC' },
+  RURAL: { label: 'Rural', icon: 'RURAL' },
+  BEACH: { label: 'Playa', icon: 'BEACH' },
 }
 
 export const seasonGradients = {

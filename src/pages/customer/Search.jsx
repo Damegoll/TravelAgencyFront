@@ -4,6 +4,15 @@ import PackageCard from '../../components/PackageCard'
 import { seasonLabels, packageTypeLabels, travelTypeLabels } from '../../data/mockData'
 import { packageService } from '../../api/packageService'
 import { formatCLP } from '../../utils/format'
+import { MagnifyingGlassIcon, ExclamationTriangleIcon, BuildingLibraryIcon, BoltIcon, FireIcon, GlobeAltIcon, SunIcon } from '@heroicons/react/24/outline'
+
+const travelTypeIcons = {
+  CULTURAL: BuildingLibraryIcon,
+  ADVENTURE: BoltIcon,
+  GASTRONOMIC: FireIcon,
+  RURAL: GlobeAltIcon,
+  BEACH: SunIcon,
+}
 
 const allSeasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 const allTypes = ['LUXURY', 'BUDGET', 'FAMILY']
@@ -204,7 +213,8 @@ export default function Search() {
                           : 'text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-700/50'
                         }`}
                     >
-                      <span>{info.emoji} {info.label}</span>
+                      {(() => { const TIcon = travelTypeIcons[type]; return TIcon ? <TIcon className="w-4 h-4" /> : null })()}
+                      <span>{info.label}</span>
                     </button>
                   )
                 })}
@@ -266,7 +276,7 @@ export default function Search() {
             </div>
           ) : error ? (
             <div className="text-center py-20 bg-white dark:bg-surface-800/40 rounded-2xl border border-surface-200/50 dark:border-surface-700/50">
-              <p className="text-5xl mb-4">⚠️</p>
+              <ExclamationTriangleIcon className="w-12 h-12 mx-auto mb-4 text-warning" />
               <p className="text-surface-500 dark:text-surface-400">{error}</p>
             </div>
           ) : filteredPackages.length > 0 ? (
@@ -277,7 +287,7 @@ export default function Search() {
             </div>
           ) : (
             <div className="text-center py-20 bg-white dark:bg-surface-800/40 rounded-2xl border border-surface-200/50 dark:border-surface-700/50">
-              <p className="text-5xl mb-4">🔍</p>
+              <MagnifyingGlassIcon className="w-12 h-12 mx-auto mb-4 text-surface-400 dark:text-surface-500" />
               <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">No hay ofertas disponibles</h3>
               <p className="text-surface-500 dark:text-surface-400 mb-6">
                 Intenta ajustar los filtros o términos de búsqueda

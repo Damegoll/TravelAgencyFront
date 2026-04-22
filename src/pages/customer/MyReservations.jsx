@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { reservationService } from '../../api/reservationService'
+import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 
 export default function MyReservations() {
   const [reservations, setReservations] = useState([])
@@ -34,7 +35,7 @@ export default function MyReservations() {
 
       {reservations.length === 0 ? (
         <div className="text-center py-20 bg-white dark:bg-surface-800/40 rounded-2xl border border-surface-200/50 dark:border-surface-700/50">
-          <p className="text-5xl mb-4">📋</p>
+          <ClipboardDocumentListIcon className="w-12 h-12 mx-auto mb-4 text-surface-400 dark:text-surface-500" />
           <p className="text-surface-500 dark:text-surface-400">No tienes reservas aún</p>
         </div>
       ) : (

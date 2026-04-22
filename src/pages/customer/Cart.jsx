@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { reservationService } from '../../api/reservationService'
 import { packageTypeLabels, travelTypeGradients, travelTypeImages, discountRules } from '../../data/mockData'
 import { formatCLP } from '../../utils/format'
+import { CheckBadgeIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
 
 export default function Cart() {
   const { items, subtotal, appliedDiscounts, total, removeFromCart, updateQuantity, clearCart, itemCount } = useCart()
@@ -50,7 +51,7 @@ export default function Cart() {
   if (checkoutSuccess) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-20 text-center animate-fade-in">
-        <p className="text-6xl mb-6">🎉</p>
+        <CheckBadgeIcon className="w-16 h-16 mx-auto mb-6 text-success" />
         <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-3">¡Reserva confirmada!</h1>
         <p className="text-surface-500 dark:text-surface-400 mb-8 max-w-md mx-auto">
           Tus paquetes han sido reservados exitosamente. Puedes ver tus reservas en tu perfil.
@@ -76,7 +77,7 @@ export default function Cart() {
   if (items.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-20 text-center animate-fade-in">
-        <p className="text-6xl mb-6">🛒</p>
+        <ShoppingCartIcon className="w-16 h-16 mx-auto mb-6 text-surface-400 dark:text-surface-500" />
         <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-3">Tu carrito está vacío</h1>
         <p className="text-surface-500 dark:text-surface-400 mb-8 max-w-md mx-auto">
           Parece que no has agregado ningún paquete de viaje todavía. ¡Empieza a explorar y encuentra tu escapada perfecta!
