@@ -7,7 +7,7 @@ import Cart from './pages/customer/Cart'
 import MyReservations from './pages/customer/MyReservations'
 import Profile from './pages/customer/Profile'
 import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
+
 import Dashboard from './pages/admin/Dashboard'
 import AdminPackages from './pages/admin/AdminPackages'
 import AdminReservations from './pages/admin/AdminReservations'
@@ -41,7 +41,7 @@ export default function Router() {
       </Route>
 
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+
 
       <Route element={<AdminLayout />}>
         <Route

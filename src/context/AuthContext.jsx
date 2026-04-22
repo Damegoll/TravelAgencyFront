@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { authService } from '../api/authService'
-import { accountService } from '../api/accountService'
+
 
 const AuthContext = createContext(null)
 
@@ -42,18 +42,7 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const register = useCallback(async (data) => {
-    try {
-      await accountService.register(data)
-      return { success: true }
-    } catch (err) {
-      const message =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        'Error al registrar la cuenta'
-      return { success: false, error: message }
-    }
-  }, [])
+
 
   const logout = useCallback(() => {
     authService.logout()
@@ -73,7 +62,7 @@ export function AuthProvider({ children }) {
         isAdmin,
         isLoading,
         login,
-        register,
+
         logout,
         updateUser,
       }}

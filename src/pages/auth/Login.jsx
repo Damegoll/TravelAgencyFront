@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { getKeycloakRegistrationUrl } from '../../utils/keycloak'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -91,9 +92,9 @@ export default function Login() {
 
           <p className="text-center text-sm text-surface-500 dark:text-surface-400 mt-6">
             ¿No tienes una cuenta?{' '}
-            <Link to="/register" className="text-primary-600 dark:text-primary-400 font-medium hover:underline">
+            <a href={getKeycloakRegistrationUrl()} className="text-primary-600 dark:text-primary-400 font-medium hover:underline">
               Crear una
-            </Link>
+            </a>
           </p>
         </div>
       </div>

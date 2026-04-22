@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import PackageCard from '../../components/PackageCard'
 import { seasonLabels, seasonGradients, seasonDescriptions } from '../../data/mockData'
 import { packageService } from '../../api/packageService'
+import { getKeycloakRegistrationUrl } from '../../utils/keycloak'
 
 const seasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 
@@ -46,12 +47,12 @@ export default function Home() {
             >
               Ver Ofertas
             </Link>
-            <Link
-              to="/register"
+            <a
+              href={getKeycloakRegistrationUrl()}
               className="px-10 py-5 border-2 border-white/30 text-white font-semibold rounded-2xl hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-200"
             >
               Registrate
-            </Link>
+            </a>
           </div>
         </div>
       </section>

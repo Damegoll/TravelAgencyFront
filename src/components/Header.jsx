@@ -1,10 +1,11 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
 export default function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { itemCount } = useCart()
   const { isAuthenticated, isAdmin, user, logout } = useAuth()
   const { isDark, toggle } = useTheme()
@@ -126,7 +127,10 @@ export default function Header() {
                 Perfil
               </Link>
               <button
-                onClick={logout}
+                onClick={() => {
+                  logout()
+                  navigate('/')
+                }}
                 className="px-3 py-1.5 text-sm rounded-lg text-surface-500 dark:text-surface-400 hover:bg-surface-200/50 dark:hover:bg-white/10 transition-all duration-200"
               >
                 Cerrar Sesión

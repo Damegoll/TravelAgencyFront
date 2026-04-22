@@ -1,10 +1,6 @@
 import api from './axiosConfig'
 
 export const accountService = {
-  async register(data) {
-    const res = await api.post('/accounts/register', data)
-    return res.data
-  },
 
   async getAccount(id) {
     const res = await api.get(`/accounts/${id}`)
