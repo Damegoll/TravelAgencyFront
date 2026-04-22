@@ -3,7 +3,6 @@ npm-debug.log
 .git
 .gitignore
 .env.local
-.env
 .DS_Store
 dist/
 build/
