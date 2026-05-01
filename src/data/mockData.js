@@ -1,38 +1,3 @@
-export const discountRules = [
-  {
-    id: 'disc-1',
-    name: 'Descuento por Múltiples Reservas',
-    description: '3 o más paquetes en el carrito → 10% de descuento en todo el pedido',
-    percentage: 10,
-    condition: (items) => {
-      const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
-      return totalQuantity >= 3
-    },
-  },
-  {
-    id: 'disc-2',
-    name: 'Bono por Reserva en Volumen',
-    description: '5 o más paquetes en el carrito → 5% de descuento adicional (se acumula)',
-    percentage: 5,
-    condition: (items) => {
-      const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
-      return totalQuantity >= 5
-    },
-  },
-  {
-    id: 'disc-3',
-    name: 'Oferta Familiar de Invierno',
-    description: 'Cualquier paquete FAMILIAR en temporada de INVIERNO → 15% de descuento en ese paquete',
-    percentage: 15,
-    condition: (items) => {
-      return items.some(
-        item => item.packageData.packageType === 'FAMILY' && item.packageData.travelSeason === 'WINTER'
-      )
-    },
-  },
-]
-
-
 export const seasonLabels = {
   SUMMER: { label: 'Verano', color: 'text-amber-500' },
   WINTER: { label: 'Invierno', color: 'text-blue-400' },

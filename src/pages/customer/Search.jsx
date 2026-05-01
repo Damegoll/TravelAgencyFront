@@ -35,7 +35,7 @@ export default function Search() {
     return param ? [param] : []
   })
   const [selectedTravelTypes, setSelectedTravelTypes] = useState([])
-  const [priceRange, setPriceRange] = useState([0, 10000000])
+  const [priceRange, setPriceRange] = useState([0, 100000000])
   const [sortBy, setSortBy] = useState('date')
 
   useEffect(() => {

@@ -22,11 +22,11 @@ export default function PackageCard({ pkg, compact = false }) {
   const gradient = travelTypeGradients[pkg.travelType] || 'from-gray-400 to-gray-600'
   const imageUrl = travelTypeImages[pkg.travelType]
 
-  const isSoldOut = pkg.packageStatus === 'SOLD_OUT'
+  const isSoldOut = pkg.packageStatus === 'SOLD_OUT' || pkg.availableSpots <= 0
   const isArchived = pkg.packageStatus === 'ARCHIVED'
+  const isAvailable = !isSoldOut && !isArchived
   const isUnavailable = isSoldOut || isArchived
 
-  // Calculate duration from dates
   const startDate = new Date(pkg.packageStartDate)
   const endDate = new Date(pkg.packageEndDate)
   const days = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)))
@@ -58,8 +58,18 @@ export default function PackageCard({ pkg, compact = false }) {
             {typeInfo.label}
           </span>
           {isSoldOut && (
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-300 backdrop-blur-sm">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-900/80 text-white backdrop-blur-sm border border-gray-700 shadow-sm">
               Agotado
+            </span>
+          )}
+          {isAvailable && (
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-500/80 text-white backdrop-blur-sm border border-green-600 shadow-sm">
+              Disponible
+            </span>
+          )}
+          {isArchived && (
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/80 text-white backdrop-blur-sm border border-blue-600 shadow-sm">
+              Archivado
             </span>
           )}
         </div>

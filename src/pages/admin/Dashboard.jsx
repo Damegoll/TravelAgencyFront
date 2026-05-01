@@ -3,7 +3,7 @@ import { packageService } from '../../api/packageService'
 import { CubeIcon, ClipboardDocumentListIcon, UsersIcon } from '@heroicons/react/24/outline'
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({ packages: 0, reservations: 0, accounts: 0 })
+  const [stats, setStats] = useState({ packages: 0, reservations: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -29,7 +29,6 @@ export default function Dashboard() {
         {[
           { label: 'Total Packages', value: stats.packages, Icon: CubeIcon },
           { label: 'Reservations', value: stats.reservations, Icon: ClipboardDocumentListIcon },
-          { label: 'Accounts', value: stats.accounts, Icon: UsersIcon },
         ].map((item, idx) => (
           <div key={idx} className="bg-white dark:bg-surface-800/60 rounded-2xl border border-surface-200/50 dark:border-surface-700/50 p-6">
             <item.Icon className="w-8 h-8 text-primary-500" />
