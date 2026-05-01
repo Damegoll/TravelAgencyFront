@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { accountService } from '../../api/accountService'
+import { authService } from '../../api/authService'
 import { reservationService } from '../../api/reservationService'
-import { ClipboardDocumentListIcon, MapPinIcon, CalendarDaysIcon } from '@heroicons/react/24/outline'
+import { ClipboardDocumentListIcon, MapPinIcon, CalendarDaysIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
+
+const PHONE_REGEX = /^\+56\d{9}$/
 
 export default function Profile() {
   const { user, updateUser } = useAuth()
-  
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-  })
-  
+
+  const [phone, setPhone] = useState('')
+  const [phoneError, setPhoneError] = useState('')
+  const [isEditingPhone, setIsEditingPhone] = useState(false)
+
   const [reservations, setReservations] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -21,42 +21,57 @@ export default function Profile() {
 
   useEffect(() => {
     if (user) {
-      setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        phone: user.phone || '',
-      })
+      setPhone(user.phone || '')
     }
-    
+
     reservationService
       .getUserReservations()
       .then(setReservations)
-      .catch(() => setError('Error al cargar tus reservas'))
+      .catch(() => setError('Error al cargar tus reservas, puede que no tengas o el sistema este caido'))
       .finally(() => setLoading(false))
   }, [user])
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+  const handleEditPhone = () => {
+    setIsEditingPhone(true)
+    setError('')
+    setSuccess('')
+    setPhoneError('')
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleCancelEdit = () => {
+    setPhone(user?.phone || '')
+    setIsEditingPhone(false)
+    setError('')
+    setPhoneError('')
+  }
+
+  const handlePhoneChange = (e) => {
+    let value = e.target.value
+    value = value.replace(/[^+\d\s]/g, '')
+    setPhone(value)
+    setPhoneError('')
+  }
+
+  const handleSavePhone = async () => {
+    const cleanPhone = phone.replace(/\s/g, '')
+
+    if (!PHONE_REGEX.test(cleanPhone)) {
+      setPhoneError('Formato: +56912345678 (9 dígitos después de +56)')
+      return
+    }
+
     setError('')
     setSuccess('')
     setSaving(true)
 
     try {
-      const updated = await accountService.updateAccount(user.accountId, {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-      })
-      updateUser(updated)
-      setSuccess('Perfil actualizado exitosamente')
+      await authService.updateKeycloakPhone(cleanPhone)
+      updateUser({ ...user, phone: cleanPhone })
+      setPhone(cleanPhone)
+      setSuccess('Teléfono actualizado exitosamente')
+      setIsEditingPhone(false)
     } catch (err) {
-      const message = err?.response?.data?.message || err?.response?.data?.error || 'Error al actualizar el perfil'
-      setError(message)
+      setError(err.message || 'Error al actualizar el teléfono')
     } finally {
       setSaving(false)
     }
@@ -83,74 +98,93 @@ export default function Profile() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                   Nombre
                 </label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+                <div className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-surface-100 dark:bg-surface-700 text-surface-500 dark:text-surface-400">
+                  {user?.firstName || '—'}
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                   Apellido
                 </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                  Teléfono
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-white dark:bg-surface-700 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+                <div className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-surface-100 dark:bg-surface-700 text-surface-500 dark:text-surface-400">
+                  {user?.lastName || '—'}
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                   Email
                 </label>
-                <input
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-surface-100 dark:bg-surface-700 text-surface-500 dark:text-surface-400 focus:outline-none cursor-not-allowed"
-                />
-                <p className="text-xs text-surface-500 dark:text-surface-400 mt-1">No se puede cambiar el email</p>
+                <div className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-surface-100 dark:bg-surface-700 text-surface-500 dark:text-surface-400">
+                  {user?.email || '—'}
+                </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={saving}
-                className="w-full mt-6 px-4 py-2 bg-primary-600 hover:bg-primary-500 disabled:bg-primary-600/50 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
-              >
-                {saving ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Guardando...
-                  </>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                    Teléfono
+                  </label>
+                  {!isEditingPhone && (
+                    <button
+                      onClick={handleEditPhone}
+                      className="text-primary-500 hover:text-primary-400 transition-colors"
+                      title="Editar teléfono"
+                    >
+                      <PencilIcon className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+
+                {isEditingPhone ? (
+                  <div>
+                    <div className="flex gap-2">
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={handlePhoneChange}
+                        maxLength={15}
+                        placeholder="+56912345678"
+                        className={`flex-1 px-4 py-2 rounded-lg border ${phoneError ? 'border-danger' : 'border-primary-400 dark:border-primary-600'} bg-white dark:bg-surface-700 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500`}
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSavePhone}
+                        disabled={saving}
+                        className="p-2 bg-success/20 text-success hover:bg-success/30 rounded-lg transition-colors disabled:opacity-50"
+                        title="Guardar"
+                      >
+                        {saving ? (
+                          <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                        ) : (
+                          <CheckIcon className="w-5 h-5" />
+                        )}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="p-2 bg-danger/20 text-danger hover:bg-danger/30 rounded-lg transition-colors"
+                        title="Cancelar"
+                      >
+                        <XMarkIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                    {phoneError && (
+                      <p className="text-xs text-danger mt-1">{phoneError}</p>
+                    )}
+                  </div>
                 ) : (
-                  'Guardar Cambios'
+                  <div className="w-full px-4 py-2 rounded-lg border border-surface-200 dark:border-surface-600 bg-surface-100 dark:bg-surface-700 text-surface-500 dark:text-surface-400">
+                    {user?.phone || '—'}
+                  </div>
                 )}
-              </button>
-            </form>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -184,11 +218,10 @@ export default function Profile() {
                         </p>
                       </div>
                       <div className="text-right ml-4">
-                        <span className={`inline-block text-xs px-3 py-1.5 rounded-full font-medium mb-2 ${
-                          res.status === 'CONFIRMED' ? 'bg-success/20 text-success' : 
+                        <span className={`inline-block text-xs px-3 py-1.5 rounded-full font-medium mb-2 ${res.status === 'CONFIRMED' ? 'bg-success/20 text-success' :
                           res.status === 'PENDING' ? 'bg-warning/20 text-warning' :
-                          'bg-danger/20 text-danger'
-                        }`}>
+                            'bg-danger/20 text-danger'
+                          }`}>
                           {res.status}
                         </span>
                         <p className="text-lg font-bold text-surface-900 dark:text-white mt-2">

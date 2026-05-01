@@ -11,7 +11,7 @@ export default function MyReservations() {
     reservationService
       .getUserReservations()
       .then(setReservations)
-      .catch(() => setError('Error al cargar tus reservas'))
+      .catch(() => setError('Error al cargar tus reservas, puede que no tengas o el sistema este caido'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -52,9 +52,8 @@ export default function MyReservations() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                    res.status === 'CONFIRMED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'
-                  }`}>
+                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${res.status === 'CONFIRMED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'
+                    }`}>
                     {res.status}
                   </span>
                   <p className="text-lg font-bold text-surface-900 dark:text-white mt-2">

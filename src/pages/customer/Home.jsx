@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import PackageCard from '../../components/PackageCard'
 import { seasonLabels, seasonGradients, seasonDescriptions } from '../../data/mockData'
 import { packageService } from '../../api/packageService'
 import { getKeycloakRegistrationUrl } from '../../utils/keycloak'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { ExclamationTriangleIcon, MagnifyingGlassIcon, CubeIcon, ShieldCheckIcon, UserCircleIcon } from '@heroicons/react/24/outline'
 
 const seasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 
 export default function Home() {
+  const { user, isAuthenticated } = useAuth()
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -32,14 +34,17 @@ export default function Home() {
 
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-slide-up">
-            Conoce el{' '}
-            <span className="bg-gradient-to-r from-accent-300 to-accent-500 bg-clip-text text-transparent">
-              MUNDO
-            </span>
+            {isAuthenticated ? (
+              <>Bienvenido/a,{' '}<span className="bg-gradient-to-r from-accent-300 to-accent-500 bg-clip-text text-transparent">{user?.firstName || 'Viajero'}</span></>
+            ) : (
+              <>Conoce el{' '}<span className="bg-gradient-to-r from-accent-300 to-accent-500 bg-clip-text text-transparent">MUNDO</span></>
+            )}
           </h1>
           <p className="text-xl md:text-2xl text-primary-200 max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            Paquetes premium, economicos y familiares para cada temporada.
-            Tu proxima aventura comienza aqui.
+            {isAuthenticated
+              ? 'Explora nuestros destinos y planifica tu próxima aventura.'
+              : 'Paquetes premium, economicos y familiares para cada temporada. Tu proxima aventura comienza aqui.'
+            }
           </p>
           <div className="flex gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <Link
@@ -48,12 +53,22 @@ export default function Home() {
             >
               Ver Ofertas
             </Link>
-            <a
-              href={getKeycloakRegistrationUrl()}
-              className="px-10 py-5 border-2 border-white/30 text-white font-semibold rounded-2xl hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-200"
-            >
-              Registrate
-            </a>
+            {isAuthenticated ? (
+              <Link
+                to="/profile"
+                className="px-10 py-5 border-2 border-white/30 text-white font-semibold rounded-2xl hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
+              >
+                <UserCircleIcon className="w-5 h-5" />
+                Mi Perfil
+              </Link>
+            ) : (
+              <a
+                href={getKeycloakRegistrationUrl()}
+                className="px-10 py-5 border-2 border-white/30 text-white font-semibold rounded-2xl hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-200"
+              >
+                Registrate
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -145,31 +160,17 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              icon: (
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-              ),
+              icon: <MagnifyingGlassIcon className="w-8 h-8" />,
               title: 'Oferta Variada',
-              desc: 'Descubre destinos de todo el mundo:desde playas paradisiacas hasta aventuras en la montaña.',
+              desc: 'Descubre destinos de todo el mundo: desde playas paradisiacas hasta aventuras en la montaña.',
             },
             {
-              icon: (
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="12 1 22 5 22 19 12 23 2 19 2 5 12 1" />
-                  <polyline points="12 12.46 20.24 8.6 20.24 15.5 12 19.35 3.76 15.5 3.76 8.6 12 12.46" />
-                </svg>
-              ),
+              icon: <CubeIcon className="w-8 h-8" />,
               title: 'Mejores Precios',
               desc: 'Competimos con los mejores del mercado. Descuentos progresivos por reservas múltiples.',
             },
             {
-              icon: (
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              ),
+              icon: <ShieldCheckIcon className="w-8 h-8" />,
               title: 'Seguridad Garantizada',
               desc: 'Todos nuestros destinos son seguros. Tus datos están protegidos con encriptación.',
             },
