@@ -1,45 +1,116 @@
-import { createContext, useContext, useReducer, useEffect } from 'react'
-import { discountRules } from '../data/mockData'
+import { createContext, useContext, useReducer, useEffect, useMemo, useState } from 'react'
+import { discountService } from '../api/discountService'
 
-function calculateDiscounts(items) {
-  if (items.length === 0) return []
+const GLOBAL_CUMULATIVE_DISCOUNT_CAP = 50
 
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.packageData.packagePrice * item.quantity,
-    0
-  )
+function parseDate(value) {
+  if (!value) return null
+  return new Date(`${value}T00:00:00`)
+}
 
-  const applied = []
+function isWithinRange(date, start, end) {
+  if (!date) return false
+  if (start && date < start) return false
+  if (end && date > end) return false
+  return true
+}
 
-  for (const rule of discountRules) {
-    if (rule.condition(items)) {
-      if (rule.id === 'disc-3') {
-        const familyWinterTotal = items
-          .filter(item => item.packageData.packageType === 'FAMILY' && item.packageData.travelSeason === 'WINTER')
-          .reduce((sum, item) => sum + item.packageData.packagePrice * item.quantity, 0)
-        applied.push({ discount: rule, amount: familyWinterTotal * (rule.percentage / 100) })
-      } else {
-        applied.push({ discount: rule, amount: subtotal * (rule.percentage / 100) })
+function matchesLimitedTime(discount, pkg, now) {
+  if (discount.discountType !== 'LIMITED_TIME_OFFER') return false
+
+  const startDate = parseDate(discount.startDate)
+  const endDate = parseDate(discount.endDate)
+  if (!isWithinRange(now, startDate, endDate)) return false
+
+  if (discount.applicablePackage?.packageId) {
+    return discount.applicablePackage.packageId === pkg.packageId
+  }
+
+  if (discount.applicablePackageType && discount.applicablePackageType !== pkg.packageType) return false
+  if (discount.applicableTravelType && discount.applicableTravelType !== pkg.travelType) return false
+  if (discount.applicableTravelSeason && discount.applicableTravelSeason !== pkg.travelSeason) return false
+  return true
+}
+
+function getBestDiscount(discounts, predicate) {
+  return discounts
+    .filter(predicate)
+    .reduce((best, current) => {
+      if (!best) return current
+      if ((current.discountPercentage || 0) > (best.discountPercentage || 0)) return current
+      return best
+    }, null)
+}
+
+function getPackageDays(pkg) {
+  const start = new Date(pkg.packageStartDate)
+  const end = new Date(pkg.packageEndDate)
+  const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+  return Math.max(1, diff)
+}
+
+function computeTotals(items, discounts) {
+  const now = new Date()
+  const appliedMap = new Map()
+  let subtotal = 0
+  let totalDiscount = 0
+
+  for (const item of items) {
+    const pkg = item.packageData
+    const passengerCount = item.quantity
+    const days = getPackageDays(pkg)
+    const basePrice = pkg.packagePrice * passengerCount * days
+    subtotal += basePrice
+
+    const limitedTime = getBestDiscount(discounts, (discount) => matchesLimitedTime(discount, pkg, now))
+    const passengerDiscount = getBestDiscount(
+      discounts,
+      (discount) =>
+        discount.discountType === 'PASSENGER_COUNT' &&
+        discount.minPassengers != null &&
+        passengerCount >= discount.minPassengers
+    )
+
+    const exclusivePercent = limitedTime ? limitedTime.discountPercentage || 0 : 0
+    const allowStacking = !limitedTime || limitedTime.cumulativeWithOthers !== false
+    let cumulativePercent = 0
+
+    if (passengerDiscount && allowStacking && passengerDiscount.cumulativeWithOthers !== false) {
+      cumulativePercent = passengerDiscount.discountPercentage || 0
+      if (cumulativePercent > GLOBAL_CUMULATIVE_DISCOUNT_CAP) {
+        cumulativePercent = GLOBAL_CUMULATIVE_DISCOUNT_CAP
       }
+    }
+
+    const totalPercent = Math.min(100, exclusivePercent + cumulativePercent)
+    const discountAmount = basePrice * (totalPercent / 100)
+    totalDiscount += discountAmount
+
+    if (limitedTime && exclusivePercent > 0) {
+      const amount = basePrice * (exclusivePercent / 100)
+      const existing = appliedMap.get(limitedTime.discountId) || { discount: limitedTime, amount: 0 }
+      existing.amount += amount
+      appliedMap.set(limitedTime.discountId, existing)
+    }
+
+    if (passengerDiscount && cumulativePercent > 0) {
+      const amount = basePrice * (cumulativePercent / 100)
+      const existing = appliedMap.get(passengerDiscount.discountId) || { discount: passengerDiscount, amount: 0 }
+      existing.amount += amount
+      appliedMap.set(passengerDiscount.discountId, existing)
     }
   }
 
-  return applied
+  return {
+    subtotal,
+    appliedDiscounts: Array.from(appliedMap.values()),
+    total: Math.max(0, subtotal - totalDiscount),
+  }
 }
 
 function computeState(items) {
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.packageData.packagePrice * item.quantity,
-    0
-  )
-  const appliedDiscounts = calculateDiscounts(items)
-  const totalDiscount = appliedDiscounts.reduce((sum, d) => sum + d.amount, 0)
-
   return {
     items,
-    subtotal,
-    appliedDiscounts,
-    total: Math.max(0, subtotal - totalDiscount),
   }
 }
 
@@ -105,13 +176,32 @@ export function CartProvider({ children }) {
   }
 
   const [state, dispatch] = useReducer(cartReducer, undefined, loadInitialState)
+  const [discounts, setDiscounts] = useState([])
+
+  useEffect(() => {
+    let isMounted = true
+    discountService
+      .getActiveDiscounts()
+      .then((data) => {
+        if (isMounted) setDiscounts(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        if (isMounted) setDiscounts([])
+      })
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('travel-agency-cart', JSON.stringify(state.items))
   }, [state.items])
 
+  const totals = useMemo(() => computeTotals(state.items, discounts), [state.items, discounts])
+
   const value = {
     ...state,
+    ...totals,
     itemCount: state.items.reduce((sum, item) => sum + item.quantity, 0),
     addToCart: (pkg) => dispatch({ type: 'ADD_ITEM', payload: pkg }),
     removeFromCart: (id) => dispatch({ type: 'REMOVE_ITEM', payload: id }),

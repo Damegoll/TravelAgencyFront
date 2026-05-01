@@ -1,77 +1,21 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { useAuth } from '../../context/AuthContext'
-import { reservationService } from '../../api/reservationService'
-import { packageTypeLabels, travelTypeGradients, travelTypeImages, discountRules } from '../../data/mockData'
+import { packageTypeLabels, travelTypeGradients, travelTypeImages } from '../../data/mockData'
 import { formatCLP } from '../../utils/format'
-import { CheckBadgeIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
+import { ShoppingCartIcon } from '@heroicons/react/24/outline'
 
 export default function Cart() {
   const { items, subtotal, appliedDiscounts, total, removeFromCart, updateQuantity, clearCart, itemCount } = useCart()
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
-  const [checkingOut, setCheckingOut] = useState(false)
-  const [checkoutError, setCheckoutError] = useState('')
-  const [checkoutSuccess, setCheckoutSuccess] = useState(false)
-
   const handleCheckout = async () => {
     if (!isAuthenticated) {
       navigate('/login')
       return
     }
-
-    setCheckingOut(true)
-    setCheckoutError('')
-
-    try {
-      for (const item of items) {
-        for (let i = 0; i < item.quantity; i++) {
-          await reservationService.createReservation({
-            packageId: item.packageData.packageId,
-            reservedCheckIn: item.packageData.packageStartDate,
-            reservedCheckOut: item.packageData.packageEndDate,
-          })
-        }
-      }
-      setCheckoutSuccess(true)
-      clearCart()
-    } catch (err) {
-      setCheckoutError(
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        'Error al procesar la reserva. Intenta de nuevo.'
-      )
-    } finally {
-      setCheckingOut(false)
-    }
-  }
-
-  if (checkoutSuccess) {
-    return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center animate-fade-in">
-        <CheckBadgeIcon className="w-16 h-16 mx-auto mb-6 text-success" />
-        <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-3">¡Reserva confirmada!</h1>
-        <p className="text-surface-500 dark:text-surface-400 mb-8 max-w-md mx-auto">
-          Tus paquetes han sido reservados exitosamente. Puedes ver tus reservas en tu perfil.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Link
-            to="/my-reservations"
-            className="inline-flex px-8 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-primary hover:-translate-y-0.5"
-          >
-            Ver mis reservas
-          </Link>
-          <Link
-            to="/search"
-            className="inline-flex px-8 py-3 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 font-semibold rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 transition-all duration-200"
-          >
-            Seguir explorando
-          </Link>
-        </div>
-      </div>
-    )
+    navigate('/payment')
   }
 
   if (items.length === 0) {
@@ -200,30 +144,14 @@ export default function Cart() {
             {appliedDiscounts.length > 0 && (
               <div className="space-y-2 border-t border-surface-200/50 dark:border-surface-700/50 pt-4">
                 {appliedDiscounts.map(({ discount, amount }) => (
-                  <div key={discount.id} className="flex justify-between text-sm">
+                  <div key={discount.discountId || discount.discountName} className="flex justify-between text-sm">
                     <span className="text-success flex items-center gap-1">
                       <span className="inline-block w-2 h-2 bg-success rounded-full" />
-                      {discount.name} ({discount.percentage}%)
+                      {discount.discountName || discount.discountType} ({discount.discountPercentage}%)
                     </span>
                     <span className="text-success font-medium">-{formatCLP(amount)}</span>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {discountRules.filter(rule => !rule.condition(items)).length > 0 && (
-              <div className="space-y-2 border-t border-surface-200/50 dark:border-surface-700/50 pt-4">
-                <p className="text-xs font-medium text-surface-400 dark:text-surface-500 uppercase tracking-wider">
-                  Descuentos disponibles
-                </p>
-                {discountRules
-                  .filter(rule => !rule.condition(items))
-                  .map(rule => (
-                    <div key={rule.id} className="flex items-start gap-2 text-xs text-surface-400 dark:text-surface-500">
-                      <span className="inline-block w-2 h-2 mt-1 bg-surface-300 dark:bg-surface-600 rounded-full flex-shrink-0" />
-                      <span>{rule.description}</span>
-                    </div>
-                  ))}
               </div>
             )}
 
@@ -241,20 +169,11 @@ export default function Cart() {
               )}
             </div>
 
-            {checkoutError && (
-              <div className="bg-danger/10 border border-danger/30 text-danger text-sm rounded-xl px-4 py-3">
-                {checkoutError}
-              </div>
-            )}
-
             <button
               onClick={handleCheckout}
-              disabled={checkingOut}
               className="w-full py-3.5 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-primary hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {checkingOut
-                ? 'Procesando...'
-                : isAuthenticated
+              {isAuthenticated
                 ? 'Proceder al pago'
                 : 'Inicia sesión para reservar'}
             </button>
