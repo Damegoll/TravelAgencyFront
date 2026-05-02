@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import { reservationService } from '../../api/reservationService'
 import { formatCLP } from '../../utils/format'
-import { CheckBadgeIcon, CreditCardIcon } from '@heroicons/react/24/outline'
+import { CreditCardIcon } from '@heroicons/react/24/outline'
+import Receipt from './Receipt'
 
 function normalizeCardNumber(value) {
   return value.replace(/\s+/g, '')
@@ -62,7 +63,7 @@ export default function Payment() {
   const [cvv, setCvv] = useState('')
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(null)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -91,17 +92,19 @@ export default function Payment() {
     setProcessing(true)
 
     try {
+      const createdReservations = []
       for (const item of items) {
-        await reservationService.createReservation({
+        const reservation = await reservationService.createReservation({
           packageId: item.packageData.packageId,
           reservedCheckIn: normalizeDateTime(item.packageData.packageStartDate),
           reservedCheckOut: normalizeDateTime(item.packageData.packageEndDate),
           passengerCount: item.quantity,
         })
+        createdReservations.push(reservation)
       }
 
       clearCart()
-      setSuccess(true)
+      setSuccess(createdReservations)
     } catch (err) {
       setError(
         err?.response?.data?.message ||
@@ -114,29 +117,7 @@ export default function Payment() {
   }
 
   if (success) {
-    return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center animate-fade-in">
-        <CheckBadgeIcon className="w-16 h-16 mx-auto mb-6 text-success" />
-        <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-3">Pago aprobado</h1>
-        <p className="text-surface-500 dark:text-surface-400 mb-8 max-w-md mx-auto">
-          Tu reserva fue confirmada. Puedes revisarla en tu perfil.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Link
-            to="/my-reservations"
-            className="inline-flex px-8 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-primary hover:-translate-y-0.5"
-          >
-            Ver mis reservas
-          </Link>
-          <Link
-            to="/search"
-            className="inline-flex px-8 py-3 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 font-semibold rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 transition-all duration-200"
-          >
-            Seguir explorando
-          </Link>
-        </div>
-      </div>
-    )
+    return <Receipt reservations={success} total={total} />
   }
 
   if (items.length === 0) {

@@ -134,6 +134,9 @@ export default function Cart() {
           <div className="bg-white dark:bg-surface-800/60 rounded-2xl border border-surface-200/50 dark:border-surface-700/50 p-6 sticky top-24 space-y-5">
             <h2 className="text-xl font-bold text-surface-900 dark:text-white">
               Resumen del pedido
+              <div className="flex justify-between text-surface-600 dark:text-surface-400">
+                <span>Si eres un cliente leal, el descuento se aplica al final del pago!</span>
+              </div>
             </h2>
 
             <div className="flex justify-between text-surface-600 dark:text-surface-400">

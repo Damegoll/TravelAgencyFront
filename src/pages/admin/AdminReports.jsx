@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { reservationService } from '../../api/reservationService'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import htm12pdf from 'html2pdf.js'
+import { ArrowDownTrayIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import html2pdf from 'jspdf'
+import html2canvas from 'html2canvas'
 
 const SORT_OPTIONS = [
   { value: 'reservationCount', label: 'Por Cantidad de Reservas' },
@@ -24,6 +25,7 @@ export default function AdminReports() {
   const [rankingEndDate, setRankingEndDate] = useState('')
   const [sortBy, setSortBy] = useState('reservationCount')
   const [rankingError, setRankingError] = useState('')
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     reservationService
@@ -114,6 +116,108 @@ export default function AdminReports() {
     return sorted
   }, [rankingStartDate, rankingEndDate, sortBy, reservations])
 
+  const exportPackagesReportPDF = async () => {
+  setExporting(true)
+  try {
+    const { jsPDF } = await import('jspdf')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    
+    pdf.setFontSize(16)
+    pdf.text('Reporte de Paquetes por Período', 10, 10)
+    pdf.setFontSize(10)
+    pdf.text(`Del ${new Date(startDate).toLocaleDateString('es-CL')} al ${new Date(endDate).toLocaleDateString('es-CL')}`, 10, 18)
+    
+    let yPosition = 28
+    pdf.setFontSize(9)
+    pdf.setTextColor(100)
+    pdf.text('Cliente', 10, yPosition)
+    pdf.text('Paquete', 40, yPosition)
+    pdf.text('Pasajeros', 100, yPosition)
+    pdf.text('Valor Total', 130, yPosition)
+    pdf.text('Estado', 170, yPosition)
+    
+    yPosition += 8
+    pdf.setTextColor(0)
+    pdf.setFontSize(8)
+    
+    packagesData.forEach((res) => {
+      if (yPosition > 270) {
+        pdf.addPage()
+        yPosition = 10
+      }
+      pdf.text(String(res.accountId || 'N/A'), 10, yPosition)
+      pdf.text(String(res.reservedPackage?.packageName || 'Sin Nombre'), 40, yPosition)
+      pdf.text(String(res.passengerCount || 0), 100, yPosition)
+      pdf.text(`$${(res.totalPriceCLP || 0).toLocaleString('es-CL')}`, 130, yPosition)
+      pdf.text(String(res.status || 'Desconocido'), 170, yPosition)
+      yPosition += 7
+    })
+    
+    yPosition += 5
+    pdf.setTextColor(100)
+    pdf.setFontSize(9)
+    pdf.text(`Total: ${packagesData.length} reservas | Valor total: $${packagesData.reduce((sum, r) => sum + (r.totalPriceCLP || 0), 0).toLocaleString('es-CL')}`, 10, yPosition)
+    
+    pdf.save(`Reporte_Paquetes_${new Date(startDate).toISOString().split('T')[0]}_${new Date(endDate).toISOString().split('T')[0]}.pdf`)
+  } catch (err) {
+    console.error('Error exporting PDF:', err)
+  } finally {
+    setExporting(false)
+  }
+}
+
+const exportRankingReportPDF = async () => {
+  setExporting(true)
+  try {
+    const { jsPDF } = await import('jspdf')
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    
+    pdf.setFontSize(16)
+    pdf.text('Reporte de Ranking de Ventas', 10, 10)
+    pdf.setFontSize(10)
+    pdf.text(`Del ${new Date(rankingStartDate).toLocaleDateString('es-CL')} al ${new Date(rankingEndDate).toLocaleDateString('es-CL')}`, 10, 18)
+    
+    let yPosition = 28
+    pdf.setFontSize(9)
+    pdf.setTextColor(100)
+    pdf.text('Ranking', 10, yPosition)
+    pdf.text('Paquete', 25, yPosition)
+    pdf.text('Reservas', 80, yPosition)
+    pdf.text('Pasajeros', 110, yPosition)
+    pdf.text('Ventas', 150, yPosition)
+    
+    yPosition += 8
+    pdf.setTextColor(0)
+    pdf.setFontSize(8)
+    
+    rankingData.forEach((pkg, idx) => {
+      if (yPosition > 270) {
+        pdf.addPage()
+        yPosition = 10
+      }
+      pdf.text(`#${idx + 1}`, 10, yPosition)
+      pdf.text(String(pkg.packageName), 25, yPosition)
+      pdf.text(String(pkg.reservationCount), 80, yPosition)
+      pdf.text(String(pkg.totalPassengers), 110, yPosition)
+      pdf.text(`$${pkg.totalSales.toLocaleString('es-CL')}`, 150, yPosition)
+      yPosition += 7
+    })
+    
+    yPosition += 5
+    pdf.setTextColor(100)
+    pdf.setFontSize(9)
+    const totalReservations = rankingData.reduce((sum, r) => sum + r.reservationCount, 0)
+    const totalSales = rankingData.reduce((sum, r) => sum + r.totalSales, 0)
+    pdf.text(`Paquetes: ${rankingData.length} | Reservas: ${totalReservations} | Ventas: $${totalSales.toLocaleString('es-CL')}`, 10, yPosition)
+    
+    pdf.save(`Ranking_Ventas_${new Date(rankingStartDate).toISOString().split('T')[0]}_${new Date(rankingEndDate).toISOString().split('T')[0]}.pdf`)
+  } catch (err) {
+    console.error('Error exporting PDF:', err)
+  } finally {
+    setExporting(false)
+  }
+}
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">
@@ -196,6 +300,16 @@ export default function AdminReports() {
                   <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
                     Incluir Canceladas
                   </span>
+                  <div className="flex items-end justify-end">
+                    <button
+                      onClick={exportPackagesReportPDF}
+                      disabled={packagesData.length === 0 || exporting}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-surface-400 text-white rounded-lg font-medium transition-colors"
+                      >
+                        <ArrowDownTrayIcon className="w-4 h-4" />
+                        {exporting ? 'Exportando....' : 'Descargar PDF'}
+                      </button>
+                  </div>
                 </label>
               </div>
             </div>
@@ -329,6 +443,16 @@ export default function AdminReports() {
                     ))}
                   </select>
                   <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-surface-500" />
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={exportRankingReportPDF}
+                    disabled={rankingData.length === 0 || exporting}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-surface-400 text-white rounded-lg font-medium transition-colors"
+                    >
+                      <ArrowDownTrayIcon className="w-4 h-4" />
+                      {exporting ? 'Exportando...' : 'Descargar PDF'}
+                    </button>
                 </div>
               </div>
             </div>

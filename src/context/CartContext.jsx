@@ -59,7 +59,7 @@ function computeTotals(items, discounts) {
     const pkg = item.packageData
     const passengerCount = item.quantity
     const days = getPackageDays(pkg)
-    const basePrice = pkg.packagePrice * passengerCount * days
+    const basePrice = pkg.packagePrice * passengerCount
     subtotal += basePrice
 
     const limitedTime = getBestDiscount(discounts, (discount) => matchesLimitedTime(discount, pkg, now))
