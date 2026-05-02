@@ -13,6 +13,7 @@ import Dashboard from './pages/admin/Dashboard'
 import AdminPackages from './pages/admin/AdminPackages'
 import AdminDiscounts from './pages/admin/AdminDiscounts'
 import AdminReservations from './pages/admin/AdminReservations'
+import AdminReports from './pages/admin/AdminReports'
 import AdminAccounts from './pages/admin/AdminAccounts'
 import AdminLayout from './pages/admin/Layout'
 import NotFound from './pages/customer/NotFound'
@@ -69,6 +70,10 @@ export default function Router() {
         <Route
           path="/admin/reservations"
           element={<ProtectedRoute requireAdmin><AdminReservations /></ProtectedRoute>}
+        />
+        <Route
+          path="/admin/reports"
+          element={<ProtectedRoute requireAdmin><AdminReports /></ProtectedRoute>}
         />
         <Route
           path="/admin/accounts"

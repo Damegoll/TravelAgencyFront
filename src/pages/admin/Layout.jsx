@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
+import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { ShieldCheckIcon, CubeIcon, ClipboardDocumentListIcon, UsersIcon, TagIcon, HomeIcon } from '@heroicons/react/24/outline'
 
 const adminLinks = [
@@ -9,6 +10,7 @@ const adminLinks = [
   { to: '/admin/reservations', label: 'Reservas', Icon: ClipboardDocumentListIcon },
   { to: '/admin/discounts', label: 'Descuentos', Icon: TagIcon },
   { to: '/admin/accounts', label: 'Usuarios', Icon: UsersIcon },
+  { to: '/admin/reports', label: 'Reportes', Icon: ChartBarIcon },
 ]
 
 export default function AdminLayout() {
