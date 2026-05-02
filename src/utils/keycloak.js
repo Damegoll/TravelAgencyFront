@@ -1,4 +1,4 @@
-export const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8180'
+export const KEYCLOAK_URL = import.meta.env.VITE_KEYCLOAK_URL || 'http://146.190.78.157:8180'
 export const KEYCLOAK_REALM = import.meta.env.VITE_KEYCLOAK_REALM || 'TravelAgencyRealm'
 export const KEYCLOAK_CLIENT_ID = import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'travelagency-app'
 
