@@ -1,4 +1,5 @@
 import axios from 'axios'
+import keycloak from './keycloak'
 
 const api = axios.create({
   baseURL: (import.meta.env.VITE_API_URL) || '/api',
@@ -20,10 +21,14 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
-      window.location.href = '/'
+      localStorage.removeItem('refresh_token')
+      // Use keycloak.login() instead of window.location.href to avoid
+      // re-triggering keycloak.init() and causing an infinite redirect loop
+      keycloak.login()
     }
     return Promise.reject(error)
   }
 )
 
 export default api
+

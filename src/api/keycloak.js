@@ -1,17 +1,10 @@
 import Keycloak from "keycloak-js";
-
-keycloak.init({
-    onLoad: 'check-sso',
-    checkLoginIframe: false,
-    pkceMethod: 'S256',
-})
-
+import { KEYCLOAK_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID } from "../utils/keycloak";
 
 const keycloak = new Keycloak({
-    url: "https://146.190.78.157:8443",
-    realm: "TravelAgencyRealm",
-    clientId: "travelagency-app",
-
+    url: KEYCLOAK_URL,
+    realm: KEYCLOAK_REALM,
+    clientId: KEYCLOAK_CLIENT_ID,
 });
 
 export default keycloak;

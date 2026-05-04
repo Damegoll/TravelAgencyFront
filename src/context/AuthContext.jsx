@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import keycloak from '../api/keycloak'
 import { authService } from '../api/authService'
 
 
@@ -13,40 +14,32 @@ export function AuthProvider({ children }) {
   const phone = user?.phone ?? null
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
+    // Since keycloak.init({ onLoad: 'login-required' }) already ran in main.jsx,
+    // at this point we are guaranteed to be authenticated.
+    // Derive user info from the keycloak token.
+    if (keycloak.authenticated) {
+      authService
+        .getCurrentUser()
+        .then(setUser)
+        .catch((err) => {
+          console.error('Failed to load user profile:', err)
+        })
+        .finally(() => setIsLoading(false))
+    } else {
       setIsLoading(false)
-      return
-    }
-    authService
-      .getCurrentUser()
-      .then(setUser)
-      .catch(() => {
-        localStorage.removeItem('token')
-      })
-      .finally(() => setIsLoading(false))
-  }, [])
-
-  const login = useCallback(async (data) => {
-    try {
-      await authService.login(data)
-      const me = await authService.getCurrentUser()
-      setUser(me)
-      return { success: true }
-    } catch (err) {
-      const message =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        'Credenciales inválidas'
-      return { success: false, error: message }
     }
   }, [])
 
-
+  const login = useCallback(async () => {
+    // With login-required, the user is already logged in via Keycloak.
+    // This is kept for API compatibility but shouldn't be needed.
+    keycloak.login()
+  }, [])
 
   const logout = useCallback(() => {
-    authService.logout()
-    setUser(null)
+    localStorage.removeItem('token')
+    localStorage.removeItem('refresh_token')
+    keycloak.logout({ redirectUri: window.location.origin })
   }, [])
 
   const updateUser = useCallback((userData) => {
@@ -58,11 +51,10 @@ export function AuthProvider({ children }) {
       value={{
         user,
         phone,
-        isAuthenticated: !!user,
+        isAuthenticated: keycloak.authenticated,
         isAdmin,
         isLoading,
         login,
-
         logout,
         updateUser,
       }}
