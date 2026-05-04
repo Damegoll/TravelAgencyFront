@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
-import keycloak from './keycloak'
+import keycloak from './api/keycloak'
 
 keycloak.init({
   onLoad: 'login-required',
