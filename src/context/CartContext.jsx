@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, useMemo, useState } from 'react'
 import { discountService } from '../api/discountService'
+import { useAuth } from './AuthContext'
 
 const GLOBAL_CUMULATIVE_DISCOUNT_CAP = 50
 
@@ -163,6 +164,7 @@ function cartReducer(state, action) {
 const CartContext = createContext(null)
 
 export function CartProvider({ children }) {
+  const { isAuthenticated } = useAuth()
   const loadInitialState = () => {
     try {
       const saved = localStorage.getItem('travel-agency-cart')
@@ -180,18 +182,22 @@ export function CartProvider({ children }) {
 
   useEffect(() => {
     let isMounted = true
-    discountService
-      .getActiveDiscounts()
-      .then((data) => {
-        if (isMounted) setDiscounts(Array.isArray(data) ? data : [])
-      })
-      .catch(() => {
-        if (isMounted) setDiscounts([])
-      })
+    if (!isAuthenticated) {
+      setDiscounts([])
+    } else {
+      discountService
+        .getActiveDiscounts()
+        .then((data) => {
+          if (isMounted) setDiscounts(Array.isArray(data) ? data : [])
+        })
+        .catch(() => {
+          if (isMounted) setDiscounts([])
+        })
+    }
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [isAuthenticated])
 
   useEffect(() => {
     localStorage.setItem('travel-agency-cart', JSON.stringify(state.items))
