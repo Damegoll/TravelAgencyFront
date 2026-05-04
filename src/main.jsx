@@ -6,15 +6,15 @@ import keycloak from './api/keycloak'
 
 keycloak.init({
   onLoad: 'login-required',
-  checkLoginIframe: false
+  checkLoginIframe: false,
+  pkceMethod: 'S256',
 })
   .then((authenticated) => {
     if (!authenticated) {
       console.log("Unauthorized user, please check this");
-      window.location.reload();
+      document.getElementById('root').innerHTML = "Unauthorized"
     } else {
       console.log("Authentification succesful");
-      localStorage.setItem('kc_token', keycloak.token);
       ReactDOM.createRoot(document.getElementById('root')).render(
         <React.StrictMode>
           <App />
