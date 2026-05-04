@@ -4,8 +4,16 @@ import App from './App'
 import './index.css'
 import keycloak from './api/keycloak'
 
-// Guard against double-init (e.g. React StrictMode in dev, or HMR)
 let keycloakInitialized = false;
+
+function setAuthStatus(message) {
+  const root = document.getElementById('root')
+  if (!root) return
+  root.innerHTML =
+    '<div style="padding:1rem;font-family:system-ui,Arial,sans-serif;font-size:14px;color:#1f2937;">' +
+    message +
+    '</div>'
+}
 
 function renderApp() {
   ReactDOM.createRoot(document.getElementById('root')).render(
@@ -17,6 +25,7 @@ function renderApp() {
 
 if (!keycloakInitialized) {
   keycloakInitialized = true;
+  setAuthStatus('Keycloak init started...')
 
   keycloak.init({
     onLoad: 'login-required',
@@ -24,14 +33,12 @@ if (!keycloakInitialized) {
     pkceMethod: 'S256',
   })
     .then((authenticated) => {
+      setAuthStatus(`Keycloak authenticated: ${authenticated ? 'true' : 'false'}`)
       if (!authenticated) {
         console.warn("Keycloak: user not authenticated after init");
-        // login-required should have redirected, so this shouldn't happen.
-        // Avoid doing anything that would trigger another init/redirect.
-        document.getElementById('root').innerHTML = "Unauthorized"
+        setAuthStatus('Keycloak authenticated: false (Unauthorized)')
       } else {
         console.log("Keycloak: authentication successful");
-        // Store the token so axios interceptors and authService can use it
         localStorage.setItem('token', keycloak.token);
         if (keycloak.refreshToken) {
           localStorage.setItem('refresh_token', keycloak.refreshToken);
@@ -41,14 +48,10 @@ if (!keycloakInitialized) {
     })
     .catch((error) => {
       console.error("Keycloak: initialization failed", error);
-      document.getElementById('root').innerHTML =
-        '<div style="padding:2rem;text-align:center;">' +
-        '<h2>Authentication Error</h2>' +
-        '<p>Could not connect to the authentication server. Please try again later.</p>' +
-        '</div>';
+      const message = error?.message || 'Unknown error'
+      setAuthStatus(`Keycloak init error: ${message}`)
     });
 
-  // Set up automatic token refresh
   keycloak.onTokenExpired = () => {
     keycloak.updateToken(30)
       .then((refreshed) => {
