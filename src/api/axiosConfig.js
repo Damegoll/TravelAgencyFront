@@ -22,10 +22,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('refresh_token')
-      // Only redirect to Keycloak if the user is not already authenticated.
-      // This avoids infinite loops when a token is invalid or the API rejects it.
       if (!keycloak.authenticated) {
-        keycloak.login()
+        keycloak.login({ redirectUri: window.location.origin })
       }
     }
     return Promise.reject(error)

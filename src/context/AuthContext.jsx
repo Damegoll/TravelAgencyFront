@@ -14,9 +14,6 @@ export function AuthProvider({ children }) {
   const phone = user?.phone ?? null
 
   useEffect(() => {
-    // Since keycloak.init({ onLoad: 'login-required' }) already ran in main.jsx,
-    // at this point we are guaranteed to be authenticated.
-    // Derive user info from the keycloak token.
     if (keycloak.authenticated) {
       authService
         .getCurrentUser()
@@ -31,9 +28,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = useCallback(async () => {
-    // With login-required, the user is already logged in via Keycloak.
-    // This is kept for API compatibility but shouldn't be needed.
-    keycloak.login()
+    keycloak.login({ redirectUri: window.location.origin })
   }, [])
 
   const logout = useCallback(() => {
