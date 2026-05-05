@@ -28,7 +28,7 @@ if (!keycloakInitialized) {
   setAuthStatus('Keycloak init started...')
 
   keycloak.init({
-    onLoad: 'login-required',
+    onLoad: 'check-sso',
     checkLoginIframe: false,
     pkceMethod: 'S256',
   })
