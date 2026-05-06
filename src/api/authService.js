@@ -1,4 +1,5 @@
 import { getKeycloakTokenUrl, KEYCLOAK_CLIENT_ID, KEYCLOAK_URL, KEYCLOAK_REALM } from '../utils/keycloak'
+import keycloak from './keycloak'
 
 function decodeJwtPayload(token) {
   const base64Url = token.split('.')[1]
@@ -13,6 +14,19 @@ function decodeJwtPayload(token) {
 }
 
 export const authService = {
+
+  async getAccessToken() {
+    if (keycloak?.authenticated) {
+      try {
+        await keycloak.updateToken(30)
+      } catch {
+      }
+      if (keycloak.token) return keycloak.token
+    }
+    const token = localStorage.getItem('token')
+    if (token) return token
+    throw new Error('No token')
+  },
 
   async login(data) {
     const body = new URLSearchParams({
@@ -70,7 +84,7 @@ export const authService = {
   },
 
   async getKeycloakProfile() {
-    const token = localStorage.getItem('token')
+    const token = await this.getAccessToken()
     const res = await fetch(
       `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/account`,
       {
@@ -85,7 +99,7 @@ export const authService = {
   },
 
   async updateKeycloakPhone(phone) {
-    const token = localStorage.getItem('token')
+    const token = await this.getAccessToken()
 
     const profile = await this.getKeycloakProfile()
 

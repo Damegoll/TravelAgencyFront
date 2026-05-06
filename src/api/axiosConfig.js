@@ -6,8 +6,21 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
+  async (config) => {
+    let token = null
+
+    if (keycloak?.authenticated) {
+      try {
+        await keycloak.updateToken(30)
+      } catch {
+      }
+      token = keycloak.token || null
+    }
+
+    if (!token) {
+      token = localStorage.getItem('token')
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
