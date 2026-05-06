@@ -27,10 +27,10 @@ export const seasonGradients = {
 }
 
 export const seasonDescriptions = {
-  SUMMER: 'Cualquier calor compañero',
-  WINTER: 'Ta helao, abrigarse',
-  AUTUMN: 'Inverno penca',
-  SPRING: 'Tengo la densa alergia ayudaaaaaaa',
+  SUMMER: { text: 'Sol, playa y diversion aseguradas', icon: 'SUN' },
+  WINTER: { text: 'Montañas nevadas o tranquilidad perpetua', icon: 'SNOW' },
+  AUTUMN: { text: 'Hermosos paisajes que entregan imagenes inolvidables', icon: 'LEAF' },
+  SPRING: { text: 'Revitaliza tanto el mundo como tu ser', icon: 'SPARKLES' },
 }
 
 

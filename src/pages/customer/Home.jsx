@@ -5,7 +5,8 @@ import PackageCard from '../../components/PackageCard'
 import { seasonLabels, seasonGradients, seasonDescriptions } from '../../data/mockData'
 import { packageService } from '../../api/packageService'
 import { getKeycloakRegistrationUrl } from '../../utils/keycloak'
-import { ExclamationTriangleIcon, MagnifyingGlassIcon, CubeIcon, ShieldCheckIcon, UserCircleIcon } from '@heroicons/react/24/outline'
+import {
+  ExclamationTriangleIcon, MagnifyingGlassIcon, CubeIcon, ShieldCheckIcon, UserCircleIcon, SunIcon, CloudSnowIcon, LeafIcon, SparklesIcon, } from '@heroicons/react/24/outline'
 
 const seasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 
@@ -88,6 +89,13 @@ export default function Home() {
             const info = seasonLabels[season]
             const gradient = seasonGradients[season]
             const description = seasonDescriptions[season]
+            const iconMap = {
+              SUN: SunIcon,
+              SNOW: CloudSnowIcon,
+              LEAF: LeafIcon,
+              SPARKLES: SparklesIcon,
+            }
+            const SeasonIcon = iconMap[description?.icon] || SunIcon
             return (
               <Link
                 key={season}
@@ -96,8 +104,9 @@ export default function Home() {
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-90 group-hover:opacity-100 transition-opacity`} />
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-white p-4">
+                  <SeasonIcon className="w-6 h-6 mb-2" />
                   <h3 className="text-xl font-bold">{info.label}</h3>
-                  <p className="text-sm text-white/80 text-center mt-1">{description}</p>
+                  <p className="text-sm text-white/80 text-center mt-1">{description?.text}</p>
                 </div>
               </Link>
             )

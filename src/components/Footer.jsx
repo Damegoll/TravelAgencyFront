@@ -21,7 +21,6 @@ export default function Footer() {
                 { to: '/', label: 'Inicio' },
                 { to: '/search', label: 'Buscar Ofertas' },
                 { to: '/cart', label: 'Mi Carrito' },
-                { to: '/login', label: 'Iniciar Sesión' },
               ].map(link => (
                 <li key={link.to}>
                   <Link
