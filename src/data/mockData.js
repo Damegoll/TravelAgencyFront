@@ -29,12 +29,11 @@ export const seasonGradients = {
 }
 
 export const seasonDescriptions = {
-  SUMMER: { text: 'Sol, playa y diversion aseguradas', icon: 'SUN' },
-  WINTER: { text: 'Montañas nevadas o tranquilidad perpetua', icon: 'SNOW' },
-  AUTUMN: { text: 'Hermosos paisajes que entregan imagenes inolvidables', icon: 'LEAF' },
-  SPRING: { text: 'Revitaliza tanto el mundo como tu ser', icon: 'SPARKLES' },
+  SUMMER: 'Sol, playa y diversion aseguradas',
+  WINTER: 'Montañas nevadas o tranquilidad perpetua',
+  AUTUMN: 'Hermosos paisajes que entregan imagenes inolvidables',
+  SPRING: 'Revitaliza tanto el mundo como tu ser',
 }
-
 
 export const travelTypeGradients = {
   CULTURAL: 'from-purple-400 via-indigo-500 to-blue-600',
