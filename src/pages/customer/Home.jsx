@@ -6,7 +6,7 @@ import { seasonLabels, seasonGradients, seasonDescriptions } from '../../data/mo
 import { packageService } from '../../api/packageService'
 import { getKeycloakRegistrationUrl } from '../../utils/keycloak'
 import {
-  ExclamationTriangleIcon, MagnifyingGlassIcon, CubeIcon, ShieldCheckIcon, UserCircleIcon, SunIcon, CloudSnowIcon, LeafIcon, SparklesIcon, } from '@heroicons/react/24/outline'
+  ExclamationTriangleIcon, MagnifyingGlassIcon, CubeIcon, ShieldCheckIcon, UserCircleIcon, SunIcon, SnowflakeIcon, LeafIcon, SparklesIcon, } from '@heroicons/react/24/outline'
 
 const seasons = ['SUMMER', 'WINTER', 'AUTUMN', 'SPRING']
 
@@ -91,7 +91,7 @@ export default function Home() {
             const description = seasonDescriptions[season]
             const iconMap = {
               SUN: SunIcon,
-              SNOW: CloudSnowIcon,
+              SNOW: SnowflakeIcon,
               LEAF: LeafIcon,
               SPARKLES: SparklesIcon,
             }

@@ -1,3 +1,5 @@
+// NOTE TO SELF: This entire folder is just to have the images and texts that are in the page
+// even tho its says "mockData", there is actual no mocks besides the images that are from google
 export const seasonLabels = {
   SUMMER: { label: 'Verano', color: 'text-amber-500' },
   WINTER: { label: 'Invierno', color: 'text-blue-400' },
