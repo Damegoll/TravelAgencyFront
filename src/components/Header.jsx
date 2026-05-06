@@ -1,13 +1,12 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
 export default function Header() {
   const location = useLocation()
-  const navigate = useNavigate()
   const { itemCount } = useCart()
-  const { isAuthenticated, isAdmin, user, logout } = useAuth()
+  const { isAuthenticated, isAdmin, user, login, logout } = useAuth()
   const { isDark, toggle } = useTheme()
 
   const isActive = (path) => location.pathname === path
@@ -127,22 +126,19 @@ export default function Header() {
                 Perfil
               </Link>
               <button
-                onClick={() => {
-                  logout()
-                  navigate('/')
-                }}
+                onClick={logout}
                 className="px-3 py-1.5 text-sm rounded-lg text-surface-500 dark:text-surface-400 hover:bg-surface-200/50 dark:hover:bg-white/10 transition-all duration-200"
               >
                 Cerrar Sesión
               </button>
             </div>
           ) : (
-            <Link
-              to="/login"
+            <button
+              onClick={login}
               className="ml-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-primary"
             >
               Iniciar Sesión
-            </Link>
+            </button>
           )}
         </div>
       </nav>

@@ -7,7 +7,6 @@ import Cart from './pages/customer/Cart'
 import Payment from './pages/customer/Payment'
 import MyReservations from './pages/customer/MyReservations'
 import Profile from './pages/customer/Profile'
-import Login from './pages/auth/Login'
 
 import Dashboard from './pages/admin/Dashboard'
 import AdminPackages from './pages/admin/AdminPackages'
@@ -51,9 +50,6 @@ export default function Router() {
         />
       </Route>
 
-      <Route path="/login" element={<Login />} />
-
-
       <Route element={<AdminLayout />}>
         <Route
           path="/admin/dashboard"
@@ -81,6 +77,7 @@ export default function Router() {
         />
       </Route>
 
+      <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/404" element={<NotFound />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
